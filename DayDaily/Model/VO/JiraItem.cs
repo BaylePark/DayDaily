@@ -1,4 +1,4 @@
-﻿namespace DayDaily.Model
+﻿namespace DayDaily.Model.VO
 {
     public class JiraItem
     {

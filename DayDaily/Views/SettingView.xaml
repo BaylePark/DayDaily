@@ -1,0 +1,188 @@
+﻿<UserControl x:Class="DayDaily.Views.SettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:behaviors="clr-namespace:DayDaily.Common.Behaviors"
+             xmlns:vo="clr-namespace:DayDaily.Model.VO"
+             xmlns:vm="clr-namespace:DayDaily.ViewModel"
+             xmlns:cvt="clr-namespace:DayDaily.Common.Converter"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             DataContext="{Binding Setting, Source={StaticResource Locator}}" 
+             d:DesignWidth="1920" d:DesignHeight="1080"
+             behaviors:FocusAfterLoadedBehavior.FocusAfterLoaded="True"
+             behaviors:InputBindingsBehavior.TakesInputBindingPrecedence="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <cvt:StringFormatConverter x:Key="stringFormatConverter" />
+                    <cvt:SizeToStringConverter x:Key="sizeToStringConverter" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <Storyboard x:Key="returnKeyStoryboard" AutoReverse="True" RepeatBehavior="Forever">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(TranslateTransform.Y)" Storyboard.TargetName="returnKeyViewBox">
+                    <EasingDoubleKeyFrame KeyTime="0" Value="0">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <BackEase EasingMode="EaseOut"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                    <EasingDoubleKeyFrame KeyTime="0:0:1" Value="-20">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <BackEase EasingMode="EaseIn"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource returnKeyStoryboard}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding MoveFocusCommand}" Key="Left" CommandParameter="{x:Static vm:MoveFocusType.Left}" />
+        <KeyBinding Command="{Binding MoveFocusCommand}" Key="Right" CommandParameter="{x:Static vm:MoveFocusType.Right}" />
+        <KeyBinding Command="{Binding CompleteCommand}" Key="Return" />
+    </UserControl.InputBindings>
+
+    <Border Padding="20">
+        <Grid>
+            <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock FontSize="60" Text="출력할 화면을 선택해주세요" HorizontalAlignment="Center" />
+                <ItemsControl ItemsSource="{Binding ScreenList}" Focusable="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vo:ScreenInfo}">
+                            <DataTemplate.Resources>
+                                <Storyboard x:Key="ScreenFocused" RepeatBehavior="Forever" AutoReverse="True">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1.2">
+                                            <EasingDoubleKeyFrame.EasingFunction>
+                                                <ExponentialEase EasingMode="EaseInOut"/>
+                                            </EasingDoubleKeyFrame.EasingFunction>
+                                        </EasingDoubleKeyFrame>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1.2">
+                                            <EasingDoubleKeyFrame.EasingFunction>
+                                                <ExponentialEase EasingMode="EaseInOut"/>
+                                            </EasingDoubleKeyFrame.EasingFunction>
+                                        </EasingDoubleKeyFrame>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </DataTemplate.Resources>
+                            <Border CornerRadius="20" BorderBrush="#FFD8D8D8" BorderThickness="1" Margin="40" RenderTransformOrigin="0.5,0.5" Background="White">
+                                <Border.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                    </TransformGroup>
+                                </Border.RenderTransform>
+                                <Border.Style>
+                                    <Style>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard Storyboard="{StaticResource ScreenFocused}" />
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
+                                                                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1.0">
+                                                                    <EasingDoubleKeyFrame.EasingFunction>
+                                                                        <ExponentialEase EasingMode="EaseInOut"/>
+                                                                    </EasingDoubleKeyFrame.EasingFunction>
+                                                                </EasingDoubleKeyFrame>
+                                                            </DoubleAnimationUsingKeyFrames>
+                                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                                                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1.0">
+                                                                    <EasingDoubleKeyFrame.EasingFunction>
+                                                                        <ExponentialEase EasingMode="EaseInOut"/>
+                                                                    </EasingDoubleKeyFrame.EasingFunction>
+                                                                </EasingDoubleKeyFrame>
+                                                            </DoubleAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.ExitActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid Width="150" Margin="20">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock HorizontalAlignment="Center" Text="SCREEN">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                    <Setter Property="FontFamily" Value="/DayDaily;component/Resources/#NanumSquare" />
+                                                    <Setter Property="FontSize" Value="23.5px" />
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock HorizontalAlignment="Center" Margin="0,-10">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                    <Setter Property="FontFamily" Value="/DayDaily;component/Resources/#NanumSquare ExtraBold" />
+                                                    <Setter Property="FontSize" Value="75px" />
+                                                </Style>
+                                            </TextBlock.Style>
+                                            <TextBlock.Text>
+                                                <Binding Path="Info.Index" Converter="{StaticResource stringFormatConverter}">
+                                                    <Binding.ConverterParameter>
+                                                        <sys:String>#{0}</sys:String>
+                                                    </Binding.ConverterParameter>
+                                                </Binding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Info.Resolution, Converter={StaticResource sizeToStringConverter}}" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                    <Setter Property="FontFamily" Value="/DayDaily;component/Resources/#NanumSquare Light" />
+                                                    <Setter Property="FontSize" Value="17px" />
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </WrapPanel>
+            
+            <Viewbox x:Name="returnKeyViewBox" Height="42" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
+                <Viewbox.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Viewbox.RenderTransform>
+                <WrapPanel Orientation="Horizontal">
+                    <TextBlock Text="완료됐으면 Enter를 눌러주세요">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="FontFamily" Value="/DayDaily;component/Resources/#NanumSquare Light" />
+                                <Setter Property="FontSize" Value="40" />
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Canvas Width="24" Height="24"  RenderTransformOrigin="0.5,0.5">
+                        <Path Data="M19,7V11H5.83L9.41,7.41L8,6L2,12L8,18L9.41,16.58L5.83,13H21V7H19Z" Fill="{DynamicResource MaterialDesignBody}" />
+                    </Canvas>
+                </WrapPanel>
+            </Viewbox>
+        </Grid>
+    </Border>
+</UserControl>

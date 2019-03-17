@@ -1,7 +1,5 @@
-﻿using System;
+﻿using DayDaily.Model.VO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DayDaily.Model
@@ -9,5 +7,9 @@ namespace DayDaily.Model
     public interface IDataService
     {
         Task LoadAsync();
+        IList<UserInfo> GetAllUserInfos();
+        DeveloperInfo GetCurrentDeveloperInfo();
+        void SetCurrentDeveloper(string name);
+        string GetWelcomeMessage();
     }
 }

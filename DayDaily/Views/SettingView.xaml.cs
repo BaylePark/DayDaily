@@ -18,9 +18,9 @@ namespace DayDaily.Views
     /// <summary>
     /// UserSettingView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class UserSettingView : UserControl
+    public partial class SettingView : UserControl
     {
-        public UserSettingView()
+        public SettingView()
         {
             InitializeComponent();
         }

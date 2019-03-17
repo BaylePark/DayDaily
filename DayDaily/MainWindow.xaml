@@ -7,38 +7,57 @@
         xmlns:vm="clr-namespace:DayDaily.ViewModel"
         xmlns:vw="clr-namespace:DayDaily.Views"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:ctrls="clr-namespace:DayDaily.Controls"
         mc:Ignorable="d ignore"
-        Width="{Binding WindowRect.Width}"
-        Height="{Binding WindowRect.Height}"
-        Left="{Binding WindowRect.Left}"
-        Top="{Binding WindowRect.Right}"
         Title="DayDaily"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto" 
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
-        ResizeMode="NoResize" WindowState="Maximized" WindowStyle="None" WindowStartupLocation="CenterScreen">
+        ResizeMode="NoResize" 
+        WindowStyle="None" 
+        Background="{x:Null}"
+        AllowsTransparency="True"
+        MinWidth="{Binding WindowRect.Width, Mode=TwoWay}" MinHeight="{Binding WindowRect.Height, Mode=TwoWay}"
+        Left="{Binding WindowRect.X, Mode=TwoWay}" Top="{Binding WindowRect.Y, Mode=TwoWay}"
+        SizeToContent="WidthAndHeight">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Skins/MainSkin.xaml" />
                 <ResourceDictionary>
-                    <DataTemplate DataType="{x:Type vm:UserSettingViewModel}">
-                        <vw:UserSettingView />
+                    <DataTemplate DataType="{x:Type vm:LoadingViewModel}">
+                        <vw:LoadingView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type vm:SettingViewModel}">
+                        <vw:SettingView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type vm:UserViewModel}">
+                        <vw:UserView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type vm:JiraViewModel}">
+                        <vw:JiraView />
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <mvvm:EventToCommand Command="{Binding LoadedCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
-    <Viewbox>
+    <Viewbox Width="{Binding WorkingRect.Width, Mode=TwoWay}" Height="{Binding WorkingRect.Height, Mode=TwoWay}">
         <Grid x:Name="LayoutRoot" Width="1920" Height="1080">
-            <ContentControl x:Name="SelectedViewModel" Content="{Binding CurrentViewModel}" />
+            <Grid.OpacityMask>
+                <VisualBrush Visual="{Binding ElementName=clippingBorder}" />
+            </Grid.OpacityMask>
+            <Border x:Name="clippingBorder" CornerRadius="20" Background="{DynamicResource MaterialDesignPaper}" />
+            <ctrls:AnimatedContentControl x:Name="selectedViewModel" Content="{Binding CurrentViewModel}">
+                <ctrls:AnimatedContentControl.OpeningEffects>
+                    <materialDesign:TransitionEffect Kind="FadeIn" />
+                    <materialDesign:TransitionEffect Kind="ExpandIn" />
+                </ctrls:AnimatedContentControl.OpeningEffects>
+            </ctrls:AnimatedContentControl>
         </Grid>
     </Viewbox>
 </Window>
