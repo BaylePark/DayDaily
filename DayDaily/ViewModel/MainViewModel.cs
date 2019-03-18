@@ -30,11 +30,8 @@ namespace DayDaily.ViewModel
             var selectedScreenIdx = _settingService.SelectedScreenIndex;
             WindowRect = _settingService.GetWindowRectFromIndex(selectedScreenIdx);
             WorkingRect = CalculateWorkingSize(WindowRect);
-#if DEBUG
+
             CurrentViewModel = SimpleIoc.Default.GetInstance<LoadingViewModel>();
-#else
-            CurrentViewModel = SimpleIoc.Default.GetInstance<LoadingViewModel>();
-#endif
 
             MessengerInstance.Register<ChangeWindowRectMessage>(this, (msg) =>
             {
@@ -54,8 +51,15 @@ namespace DayDaily.ViewModel
                 }
                 else if (msg.From is UserViewModel)
                 {
+                    _dataService.SetNextUser();
                     CurrentViewModel = new JiraViewModel();
                 }
+            });
+
+            MessengerInstance.Register<SkipUserMessage>(this, (msg) =>
+            {
+                _dataService.SetNextUser();
+                CurrentViewModel = new JiraViewModel();
             });
         }
 

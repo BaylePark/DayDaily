@@ -56,6 +56,7 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.5.0.1205, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.2.5.0.1205\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -107,12 +108,15 @@
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Controls\AnimatedContentControl.cs" />
     <Compile Include="Controls\AnimatedItemsControlContent.cs" />
+    <Compile Include="Controls\MainViewDataTemplateSelector.cs" />
     <Compile Include="Controls\ShakingTextBlock.cs" />
     <Compile Include="Controls\Timer.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Design\DesignSettingService.cs" />
+    <Compile Include="Design\MockCreator.cs" />
     <Compile Include="Messages\ChangeWindowRectMessage.cs" />
     <Compile Include="Messages\CompleteMessage.cs" />
+    <Compile Include="Messages\SkipUserMessage.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\ISettingService.cs" />
@@ -120,7 +124,6 @@
     <Compile Include="Model\SettingService.cs" />
     <Compile Include="Model\VO\ScreenInfo.cs" />
     <Compile Include="Model\VO\Settings.cs" />
-    <Compile Include="Model\VO\DeveloperInfo.cs" />
     <Compile Include="Model\VO\UserInfo.cs" />
     <Compile Include="ViewModel\JiraViewModel.cs" />
     <Compile Include="ViewModel\LoadingViewModel.cs" />

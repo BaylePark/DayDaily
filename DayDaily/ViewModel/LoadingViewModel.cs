@@ -18,14 +18,12 @@ namespace DayDaily.ViewModel
         {
             get => _loadedCommand ?? (_loadedCommand = new RelayCommand(async () =>
             {
-#if DEBUG
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
+                    await _dataService.LoadAsync();
                     Thread.Sleep(1000);
                 });
-#else
-                await _dataService.LoadAsync();
-#endif
+
                 MessengerInstance.Send(new CompleteMessage(this));
             }));
         }

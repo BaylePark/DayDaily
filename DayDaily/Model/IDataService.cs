@@ -6,10 +6,12 @@ namespace DayDaily.Model
 {
     public interface IDataService
     {
+        UserInfo CurrentUser { get; set; }
+
         Task LoadAsync();
         IList<UserInfo> GetAllUserInfos();
-        DeveloperInfo GetCurrentDeveloperInfo();
-        void SetCurrentDeveloper(string name);
-        string GetWelcomeMessage();
+        IList<JiraItem> GetJiraItemsByUserName(string name);
+        void AddOrderedUser(UserInfo user);
+        void SetNextUser();
     }
 }

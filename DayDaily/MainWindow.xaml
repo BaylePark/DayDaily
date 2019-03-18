@@ -27,22 +27,16 @@
 
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary>
-                    <DataTemplate DataType="{x:Type vm:LoadingViewModel}">
-                        <vw:LoadingView />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type vm:SettingViewModel}">
-                        <vw:SettingView />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type vm:UserViewModel}">
-                        <vw:UserView />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type vm:JiraViewModel}">
-                        <vw:JiraView />
-                    </DataTemplate>
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type vm:LoadingViewModel}">
+                <vw:LoadingView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SettingViewModel}">
+                <vw:SettingView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:UserViewModel}">
+                <vw:UserView />
+            </DataTemplate>
+            <ctrls:MainViewDataTemplateSelector x:Key="mainViewDataTemplateSelector" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -52,7 +46,7 @@
                 <VisualBrush Visual="{Binding ElementName=clippingBorder}" />
             </Grid.OpacityMask>
             <Border x:Name="clippingBorder" CornerRadius="20" Background="{DynamicResource MaterialDesignPaper}" />
-            <ctrls:AnimatedContentControl x:Name="selectedViewModel" Content="{Binding CurrentViewModel}">
+            <ctrls:AnimatedContentControl Content="{Binding CurrentViewModel}" ContentTemplateSelector="{StaticResource mainViewDataTemplateSelector}">
                 <ctrls:AnimatedContentControl.OpeningEffects>
                     <materialDesign:TransitionEffect Kind="FadeIn" />
                     <materialDesign:TransitionEffect Kind="ExpandIn" />

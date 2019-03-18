@@ -1,50 +1,42 @@
 ﻿using DayDaily.Model;
 using DayDaily.Model.VO;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DayDaily.Design
 {
     public class DesignDataService : IDataService
     {
-        public Task LoadAsync()
+        IDictionary<string, UserInfo> _users = new Dictionary<string, UserInfo>();
+        IList<JiraItem> _jiraItems = new List<JiraItem>();
+        IList<UserInfo> _orderedUsers = new List<UserInfo>();
+        int _currentUserIndex = 0;
+
+        public UserInfo CurrentUser { get; set; }
+
+        public DesignDataService()
         {
-            return null;
+            MockCreator.CreateUsers(_users);
+            MockCreator.CreateJiraItems(_users, _jiraItems);
+            CurrentUser = _users.ElementAt(0).Value;
         }
 
-        public IList<UserInfo> GetAllUserInfos()
+        public async Task LoadAsync() { }
+
+        public IList<UserInfo> GetAllUserInfos() => new List<UserInfo>(from keyValuePair in _users select keyValuePair.Value);
+
+        public IList<JiraItem> GetJiraItemsByUserName(string name) => new List<JiraItem>(from jiraitem in _jiraItems where jiraitem.User.Name == name select jiraitem);
+
+        public void AddOrderedUser(UserInfo user)
         {
-            UserInfo[] userInfos = new UserInfo[]
-            {
-                new UserInfo() { Name = "박병훈" },
-                new UserInfo() { Name = "황재경" },
-                new UserInfo() { Name = "김현태" },
-                new UserInfo() { Name = "백종민" },
-                new UserInfo() { Name = "이지혜" },
-                new UserInfo() { Name = "장병욱" },
-            };
-            return new List<UserInfo>(userInfos);
+            _orderedUsers.Add(user);
         }
 
-        public DeveloperInfo GetCurrentDeveloperInfo()
+        public void SetNextUser()
         {
-            var developer = new DeveloperInfo(new UserInfo() { Name = "박병훈" });
-            developer.JiraItems.Add(new JiraItem("New Jira Item #1"));
-            developer.JiraItems.Add(new JiraItem("New Jira Item #2"));
-            developer.JiraItems.Add(new JiraItem("New Jira Item #3"));
-            developer.JiraItems.Add(new JiraItem("New Jira Item #4"));
-            return developer;
-        }
-
-        public void SetCurrentDeveloper(string name)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public string GetWelcomeMessage()
-        {
-            return @"안녕하세요!" + Environment.NewLine + @"오늘도 즐거운 하루 되세요!";
+            CurrentUser = _orderedUsers[_currentUserIndex];
+            _currentUserIndex++;
         }
     }
 }

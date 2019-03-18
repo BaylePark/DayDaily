@@ -42,8 +42,11 @@ namespace DayDaily.ViewModel
         public UserViewModel(IDataService dataService)
         {
             _dataService = dataService;
-
             AddShuffledUser(_dataService.GetAllUserInfos());
+            foreach(var user in ShuffledUsers)
+            {
+                _dataService.AddOrderedUser(user);
+            }
         }
     }
 }

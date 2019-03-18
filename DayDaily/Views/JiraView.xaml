@@ -7,11 +7,16 @@
              xmlns:local="clr-namespace:DayDaily.Views"
              xmlns:vm="clr-namespace:DayDaily.ViewModel"
              xmlns:converter="clr-namespace:DayDaily.Common.Converter"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance vm:JiraViewModel, IsDesignTimeCreatable=True}" 
              d:DesignHeight="1080" d:DesignWidth="1920"
              behaviors:FocusAfterLoadedBehavior.FocusAfterLoaded="True"
              behaviors:InputBindingsBehavior.TakesInputBindingPrecedence="True">
+
     <UserControl.Resources>
         <ResourceDictionary>
             <converter:PathToBitmapImageConverter x:Key="pathToBitmapImageConverter" />
@@ -51,7 +56,7 @@
                         </EasingDoubleKeyFrame.EasingFunction>
                     </EasingDoubleKeyFrame>
                 </DoubleAnimationUsingKeyFrames>
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="welcomeMsgTextBlock">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="otherInfoWrapPanel">
                     <EasingDoubleKeyFrame KeyTime="0" Value="-60"/>
                     <EasingDoubleKeyFrame KeyTime="0:0:1" Value="0">
                         <EasingDoubleKeyFrame.EasingFunction>
@@ -63,29 +68,37 @@
                     <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
                     <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
                 </DoubleAnimationUsingKeyFrames>
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="welcomeMsgTextBlock">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="otherInfoWrapPanel">
                     <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
                     <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
                 </DoubleAnimationUsingKeyFrames>
             </Storyboard>
         </ResourceDictionary>
     </UserControl.Resources>
-    <UserControl.Triggers>
-        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-            <BeginStoryboard Storyboard="{StaticResource loadSplashStoryboard}"/>
-        </EventTrigger>
-    </UserControl.Triggers>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <ei:ControlStoryboardAction Storyboard="{StaticResource loadSplashStoryboard}" ControlStoryboardOption="Play" />
+        </i:EventTrigger>
+        <ei:DataTrigger Binding="{Binding SplashViewVisibility}" Value="False">
+            <ei:ControlStoryboardAction Storyboard="{StaticResource hideSplashStoryboard}" ControlStoryboardOption="Play" />
+        </ei:DataTrigger>
+    </i:Interaction.Triggers>
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding SkipUserCommand}" Key="Right" />
+        <KeyBinding Command="{Binding StartDailyMeetingCommand}" Key="Down" />
+    </UserControl.InputBindings>
+
     <Grid>
         <Border Padding="20,160,20,20">
-            <Grid>
-
-            </Grid>
+            <Grid/>
         </Border>
         <Grid x:Name="splashGrid" Background="#7F204E5F">
             <WrapPanel Orientation="Vertical" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center">
-                <WrapPanel x:Name="userInfoWrapPanel" Orientation="Vertical" Width="300" RenderTransformOrigin="0.5,0.5">
+                <WrapPanel x:Name="userInfoWrapPanel" Margin="40" Orientation="Vertical" Width="300" RenderTransformOrigin="0.5,0.5">
                     <WrapPanel.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -99,18 +112,20 @@
                             <ImageBrush ImageSource="{Binding UserInfo.Name, ConverterParameter=.jpg, Converter={StaticResource pathToBitmapImageConverter}}" Stretch="UniformToFill" />
                         </Ellipse.Fill>
                     </Ellipse>
-                    <TextBlock Text="{Binding UserInfo.Name}" FontSize="60" FontFamily="/DayDaily;component/Resources/#NanumSquare ExtraBold" HorizontalAlignment="Center" />
                 </WrapPanel>
-                <TextBlock x:Name="welcomeMsgTextBlock" Text="{Binding WelcomeMessage}" FontSize="50" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,20,0,0" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5" >
-                    <TextBlock.RenderTransform>
+                <WrapPanel x:Name="otherInfoWrapPanel" Orientation="Vertical" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center">
+                    <WrapPanel.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
                             <SkewTransform/>
                             <RotateTransform/>
                             <TranslateTransform/>
                         </TransformGroup>
-                    </TextBlock.RenderTransform>
-                </TextBlock>
+                    </WrapPanel.RenderTransform>
+                    <TextBlock Text="{Binding UserInfo.Name}" FontSize="60" TextAlignment="Center" FontFamily="/DayDaily;component/Resources/#NanumSquare ExtraBold" />
+                    <TextBlock Text="{Binding UserInfo.SingleID}" FontSize="50" TextAlignment="Center" />
+                    <TextBlock Text="{Binding UserInfo.Belong}" FontSize="40" TextAlignment="Center"  />
+                </WrapPanel>
             </WrapPanel>
         </Grid>
         <Grid x:Name="userThumbGrid" Visibility="Hidden">
@@ -124,7 +139,7 @@
                     </TransformGroup>
                 </Ellipse.RenderTransform>
                 <Ellipse.Fill>
-                    <ImageBrush ImageSource="{Binding UserInfo.Name, Converter={StaticResource pathToBitmapImageConverter}, ConverterParameter='.jpg'}" Stretch="UniformToFill" />
+                    <ImageBrush ImageSource="{Binding UserInfo.Name, ConverterParameter=.jpg, Converter={StaticResource pathToBitmapImageConverter}}" Stretch="UniformToFill" />
                 </Ellipse.Fill>
             </Ellipse>
         </Grid>
