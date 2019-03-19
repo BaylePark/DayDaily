@@ -9,8 +9,10 @@
              xmlns:converter="clr-namespace:DayDaily.Common.Converter"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+             xmlns:vo="clr-namespace:DayDaily.Model.VO"
+             xmlns:ctrls="clr-namespace:DayDaily.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance vm:JiraViewModel, IsDesignTimeCreatable=True}" 
              d:DesignHeight="1080" d:DesignWidth="1920"
@@ -30,7 +32,7 @@
                 <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="splashGrid">
                     <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0"/>
                 </DoubleAnimationUsingKeyFrames>
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="ellipse">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="userThumbGrid">
                     <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="60"/>
                     <EasingDoubleKeyFrame KeyTime="0:0:0.6" Value="0">
                         <EasingDoubleKeyFrame.EasingFunction>
@@ -38,13 +40,16 @@
                         </EasingDoubleKeyFrame.EasingFunction>
                     </EasingDoubleKeyFrame>
                 </DoubleAnimationUsingKeyFrames>
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ellipse">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="userThumbGrid">
                     <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
                     <EasingDoubleKeyFrame KeyTime="0:0:0.6" Value="1">
                         <EasingDoubleKeyFrame.EasingFunction>
                             <BackEase EasingMode="EaseOut" Amplitude="3"/>
                         </EasingDoubleKeyFrame.EasingFunction>
                     </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Effect).(BlurEffect.Radius)" Storyboard.TargetName="border">
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0"/>
                 </DoubleAnimationUsingKeyFrames>
             </Storyboard>
             <Storyboard x:Key="loadSplashStoryboard">
@@ -73,11 +78,38 @@
                     <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
                 </DoubleAnimationUsingKeyFrames>
             </Storyboard>
+            <Storyboard x:Key="bounceArrowsStoryboard" AutoReverse="True" RepeatBehavior="Forever">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="leftArrow">
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="-20">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="rightArrow">
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="20">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="downArrow">
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="20">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+
+            <SolidColorBrush x:Key="indicatorColor" Color="#7FFFFFFF" />
+
         </ResourceDictionary>
     </UserControl.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
+            <ei:ControlStoryboardAction Storyboard="{StaticResource bounceArrowsStoryboard}" ControlStoryboardOption="Play"/>
             <ei:ControlStoryboardAction Storyboard="{StaticResource loadSplashStoryboard}" ControlStoryboardOption="Play" />
         </i:EventTrigger>
         <ei:DataTrigger Binding="{Binding SplashViewVisibility}" Value="False">
@@ -86,15 +118,67 @@
     </i:Interaction.Triggers>
 
     <UserControl.InputBindings>
-        <KeyBinding Command="{Binding SkipUserCommand}" Key="Right" />
+        <KeyBinding Command="{Binding PrevUserCommand}" Key="Left" />
+        <KeyBinding Command="{Binding NextUserCommand}" Key="Right" />
+        <KeyBinding Command="{Binding UpKeyCommand}" Key="Up" />
         <KeyBinding Command="{Binding StartDailyMeetingCommand}" Key="Down" />
     </UserControl.InputBindings>
 
     <Grid>
-        <Border Padding="20,160,20,20">
-            <Grid/>
+        <Border x:Name="border" Padding="20,160,20,20">
+            <Border.Effect>
+                <BlurEffect Radius="20"/>
+            </Border.Effect>
+            <Grid>
+                <ctrls:AnimatedScrollViewer VerticalScrollBarVisibility="Hidden" CurrentVerticalOffset="{Binding VerticalScrollOffset}">
+                    <ItemsControl ItemsSource="{Binding JiraItemsByStatus}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="5" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ItemsControl ItemsSource="{Binding}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vo:JiraItem}">
+                                            <DataTemplate.Resources>
+                                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" />
+                                            </DataTemplate.Resources>
+                                            <ctrls:ShakingBorder 
+                                            BorderBrush="#FFD8D8D8" BorderThickness="1"
+                                            IsShaking="{Binding DataContext.IsShaking, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                            CornerRadius="20" Margin="5" Background="White" Padding="10">
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="{Binding Key}" Margin="0,5"/>
+                                                    <TextBlock Text="{Binding Title}" 
+                                                               TextWrapping="Wrap" Margin="0,5"
+                                                               FontFamily="/DayDaily;component/Resources/#NanumSquare"
+                                                               FontSize="20px" />
+                                                    <Border CornerRadius="10" Padding="10,5" Background="AliceBlue">
+                                                        <TextBlock Text="{Binding EpicTitle}" 
+                                                               TextWrapping="Wrap" 
+                                                               FontSize="22" 
+                                                               FontFamily="/DayDaily;component/Resources/#NanumSquare Bold"/>
+                                                    </Border>
+                                                </StackPanel>
+                                            </ctrls:ShakingBorder>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ctrls:AnimatedScrollViewer>
+            </Grid>
         </Border>
-        <Grid x:Name="splashGrid" Background="#7F204E5F">
+
+        <Border x:Name="splashGrid" Background="#99204E5F" CornerRadius="20" d:IsHidden="True">
             <WrapPanel Orientation="Vertical" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center">
@@ -127,21 +211,126 @@
                     <TextBlock Text="{Binding UserInfo.Belong}" FontSize="40" TextAlignment="Center"  />
                 </WrapPanel>
             </WrapPanel>
+        </Border>
+
+        <Grid d:IsHidden="True">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SplashViewVisibility}" Value="False">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <WrapPanel Margin="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <WrapPanel.Style>
+                    <Style TargetType="{x:Type WrapPanel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsFirstUser}" Value="True">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </WrapPanel.Style>
+                <Viewbox x:Name="leftArrow" Width="48" Height="48" RenderTransformOrigin="0.5,0.5">
+                    <Viewbox.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Viewbox.RenderTransform>
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" Fill="{StaticResource indicatorColor}" />
+                    </Canvas>
+                </Viewbox>
+                <TextBlock TextAlignment="Left" Foreground="{StaticResource indicatorColor}">
+                    앗! 아직 말할 게 더있으시다구요?<LineBreak/>
+                    Left Key를 눌러주세요
+                </TextBlock>
+            </WrapPanel>
+            <WrapPanel Margin="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <WrapPanel.Style>
+                    <Style TargetType="{x:Type WrapPanel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLastUser}" Value="True">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </WrapPanel.Style>
+                <TextBlock TextAlignment="Right" Foreground="{StaticResource indicatorColor}">
+                    오늘은 그냥 넘어가야 한다구요?<LineBreak />
+                    Right Key를 눌러주세요
+                </TextBlock>
+                <Viewbox x:Name="rightArrow" Width="48" Height="48" RenderTransformOrigin="0.5,0.5">
+                    <Viewbox.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Viewbox.RenderTransform>
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" Fill="{StaticResource indicatorColor}" />
+                    </Canvas>
+                </Viewbox>
+            </WrapPanel>
+            <WrapPanel Margin="20" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                <TextBlock TextAlignment="Center" Foreground="{StaticResource indicatorColor}">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsAgainUser}" Value="True">
+                                    <Setter Property="Text" Value="앗! 다시돌아오셨네요?" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsAgainUser}" Value="False">
+                                    <Setter Property="Text" Value="발표... 준비됐나요? 화이팅!" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock TextAlignment="Center" Foreground="{StaticResource indicatorColor}" Text="Down Key를 눌러주세요" />
+                <Viewbox x:Name="downArrow" Width="48" Height="48" RenderTransformOrigin="0.5,0.5">
+                    <Viewbox.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Viewbox.RenderTransform>
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" Fill="{StaticResource indicatorColor}" />
+                    </Canvas>
+                </Viewbox>
+            </WrapPanel>
         </Grid>
-        <Grid x:Name="userThumbGrid" Visibility="Hidden">
-            <Ellipse x:Name="ellipse" Width="200" Height="200" Stroke="#FFD8D8D8" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-60,0,0" RenderTransformOrigin="0.5,0.5">
-                <Ellipse.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform/>
-                        <SkewTransform/>
-                        <RotateTransform/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </Ellipse.RenderTransform>
+
+        <Grid x:Name="userThumbGrid" Visibility="Hidden" 
+              Margin="0,-60,0,0" RenderTransformOrigin="0.5,0.5"
+              VerticalAlignment="Top" HorizontalAlignment="Center" >
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Grid.RenderTransform>
+            <Ellipse Width="200" Height="200" 
+                     Stroke="#FFD8D8D8" StrokeThickness="1">
                 <Ellipse.Fill>
                     <ImageBrush ImageSource="{Binding UserInfo.Name, ConverterParameter=.jpg, Converter={StaticResource pathToBitmapImageConverter}}" Stretch="UniformToFill" />
                 </Ellipse.Fill>
             </Ellipse>
+            <ctrls:UserTimer CurrentClock="{Binding CurrentClock}"
+                             Fill="#204E5F" OverTimeFill="#FF8984" VerticalAlignment="Bottom" 
+                             Width="100" Height="100"/>
         </Grid>
     </Grid>
 </UserControl>

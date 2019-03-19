@@ -16,7 +16,7 @@ namespace DayDaily.Controls
         DataTemplate CreateTemplate(Type viewModelType, Type viewType)
         {
             const string xamlTemplate = "<DataTemplate DataType=\"{{x:Type vm:{0}}}\"><v:{1} /></DataTemplate>";
-            var xaml = String.Format(xamlTemplate, viewModelType.Name, viewType.Name, viewModelType.Namespace, viewType.Namespace);
+            var xaml = String.Format(xamlTemplate, viewModelType.Name, viewType.Name);//, viewModelType.Namespace, viewType.Namespace);
 
             var context = new ParserContext();
 

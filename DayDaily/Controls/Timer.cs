@@ -9,7 +9,7 @@ namespace DayDaily.Controls
     public class UserTimer : FrameworkElement
     {
         public static readonly DependencyProperty MaxTimerProperty = DependencyProperty.Register(
-            "MaxTimerProperty",
+            "MaxTimer",
             typeof(int),
             typeof(UserTimer),
             new FrameworkPropertyMetadata(
@@ -18,7 +18,7 @@ namespace DayDaily.Controls
         public int MaxTimer { get => (int)GetValue(MaxTimerProperty); set => SetValue(MaxTimerProperty, value); }
 
         public static readonly DependencyProperty CurrentClockProperty = DependencyProperty.Register(
-            "CurrentClockProperty",
+            "CurrentClock",
             typeof(int),
             typeof(UserTimer),
             new FrameworkPropertyMetadata(
@@ -27,7 +27,7 @@ namespace DayDaily.Controls
         public int CurrentClock { get => (int)GetValue(CurrentClockProperty); set => SetValue(CurrentClockProperty, value); }
 
         public static readonly DependencyProperty FillProperty = DependencyProperty.Register(
-            "FillProperty",
+            "Fill",
             typeof(Brush),
             typeof(UserTimer),
             new FrameworkPropertyMetadata(Brushes.Black,
@@ -35,7 +35,7 @@ namespace DayDaily.Controls
         public Brush Fill { get => (Brush)GetValue(FillProperty); set => SetValue(FillProperty, value); }
 
         public static readonly DependencyProperty OverTimeFillProperty = DependencyProperty.Register(
-            "OverTimeFillProperty",
+            "OverTimeFill",
             typeof(Brush),
             typeof(UserTimer),
             new FrameworkPropertyMetadata(Brushes.Red,
@@ -43,7 +43,7 @@ namespace DayDaily.Controls
         public Brush OverTimeFill { get => (Brush)GetValue(OverTimeFillProperty); set => SetValue(OverTimeFillProperty, value); }
 
         public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(
-            "ForegroundProperty",
+            "Foreground",
             typeof(Brush),
             typeof(UserTimer),
             new FrameworkPropertyMetadata(Brushes.White,

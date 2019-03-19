@@ -19,25 +19,34 @@ namespace DayDaily.Design
         static public void CreateJiraItems(IDictionary<string, UserInfo> users, IList<JiraItem> jiraItems)
         {
             int id = 1;
+            var r = new Random();
             foreach (var keyval in users)
             {
-                var r = new Random();
                 var user = keyval.Value;
-                int itemCount = r.Next() % 10 + 15;
+                int itemCount = r.Next(10) + 15;
 
                 for (int i = 0; i < itemCount; i++)
                 {
-                    var status = (JiraItemStatus)(r.Next() % 5);
-                    var type = (JiraItemType)(r.Next() % 4);
+                    var status = (JiraItemStatus)(r.Next(5));
+                    var type = (JiraItemType)(r.Next(4));
 
-                    var jiraitem = new JiraItem("ID-" + id, type.ToString() + " #" + id, user)
+                    string title = "";
+                    int titleLen = r.Next(60) + 20;
+                    for (int j = 0; j < titleLen; j++)
+                    {
+                        char c = (char)('a' + (r.Next(24)));
+                        title += c;
+                    }
+
+                    var jiraitem = new JiraItem("ID-" + id, type.ToString() + " #" + id + " " + title, user)
                     {
                         Status = status,
                         Type = type,
-                        EpicTitle = "EPIC #" + r.Next() % 100,
+                        EpicTitle = "EPIC #" + r.Next(100),
                     };
 
                     jiraItems.Add(jiraitem);
+                    id++;
                 }
             }
         }

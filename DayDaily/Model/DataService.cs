@@ -12,7 +12,6 @@ namespace DayDaily.Model
         IDictionary<string, UserInfo> _users = new Dictionary<string, UserInfo>();
         IList<JiraItem> _jiraItems = new List<JiraItem>();
         IList<UserInfo> _orderedUsers = new List<UserInfo>();
-        int _currentUserIndex = 0;
 
         public UserInfo CurrentUser { get; set; }
 
@@ -34,10 +33,9 @@ namespace DayDaily.Model
             _orderedUsers.Add(user);
         }
 
-        public void SetNextUser()
+        public void SetUserByOrder(int index)
         {
-            CurrentUser = _orderedUsers[_currentUserIndex];
-            _currentUserIndex++;
+            CurrentUser = _orderedUsers[index];
         }
     }
 }

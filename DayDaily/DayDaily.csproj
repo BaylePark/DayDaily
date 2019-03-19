@@ -101,6 +101,7 @@
     </ApplicationDefinition>
     <Compile Include="Common\Behaviors\FocusAfterLoadedBehavior.cs" />
     <Compile Include="Common\Behaviors\InputBindingsBehavior.cs" />
+    <Compile Include="Common\Behaviors\ScrollViewerBehavior.cs" />
     <Compile Include="Common\Converter\PathToBitmapImageConverter.cs" />
     <Compile Include="Common\Converter\SizeToStringConverter.cs" />
     <Compile Include="Common\Converter\StringFormatConverter.cs" />
@@ -108,7 +109,9 @@
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Controls\AnimatedContentControl.cs" />
     <Compile Include="Controls\AnimatedItemsControlContent.cs" />
+    <Compile Include="Controls\AnimatedScrollViewer.cs" />
     <Compile Include="Controls\MainViewDataTemplateSelector.cs" />
+    <Compile Include="Controls\ShakingBorder.cs" />
     <Compile Include="Controls\ShakingTextBlock.cs" />
     <Compile Include="Controls\Timer.cs" />
     <Compile Include="Design\DesignDataService.cs" />
@@ -116,7 +119,7 @@
     <Compile Include="Design\MockCreator.cs" />
     <Compile Include="Messages\ChangeWindowRectMessage.cs" />
     <Compile Include="Messages\CompleteMessage.cs" />
-    <Compile Include="Messages\SkipUserMessage.cs" />
+    <Compile Include="Messages\UserPageControlMessage.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\ISettingService.cs" />

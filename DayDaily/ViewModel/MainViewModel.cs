@@ -22,6 +22,27 @@ namespace DayDaily.ViewModel
         public Size WorkingRect { get => _workingRect; set => Set(ref _workingRect, value); }
         #endregion
 
+        int _userIndex = -1;
+        public void IncreaseUser(UserPageControlMessage msg)
+        {
+            if (msg.Type == UserPageControlType.Next)
+            {
+                _userIndex++;
+                _dataService.SetUserByOrder(_userIndex);
+            }
+            else
+            {
+                _userIndex--;
+                _dataService.SetUserByOrder(_userIndex);
+            }
+            CurrentViewModel = new JiraViewModel()
+            {
+                IsFirstUser = _userIndex == 0,
+                IsLastUser = _userIndex == _dataService.GetAllUserInfos().Count - 1,
+                IsAgainUser = msg.Type == UserPageControlType.Prev,
+            };
+        }
+
         public MainViewModel(IDataService dataService, ISettingService settingService)
         {
             _dataService = dataService;
@@ -51,15 +72,13 @@ namespace DayDaily.ViewModel
                 }
                 else if (msg.From is UserViewModel)
                 {
-                    _dataService.SetNextUser();
-                    CurrentViewModel = new JiraViewModel();
+                    IncreaseUser(new UserPageControlMessage(UserPageControlType.Next));
                 }
             });
 
-            MessengerInstance.Register<SkipUserMessage>(this, (msg) =>
+            MessengerInstance.Register<UserPageControlMessage>(this, (msg) =>
             {
-                _dataService.SetNextUser();
-                CurrentViewModel = new JiraViewModel();
+                IncreaseUser(msg);
             });
         }
 

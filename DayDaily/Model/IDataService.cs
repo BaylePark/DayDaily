@@ -12,6 +12,6 @@ namespace DayDaily.Model
         IList<UserInfo> GetAllUserInfos();
         IList<JiraItem> GetJiraItemsByUserName(string name);
         void AddOrderedUser(UserInfo user);
-        void SetNextUser();
+        void SetUserByOrder(int index);
     }
 }

@@ -11,7 +11,6 @@ namespace DayDaily.Design
         IDictionary<string, UserInfo> _users = new Dictionary<string, UserInfo>();
         IList<JiraItem> _jiraItems = new List<JiraItem>();
         IList<UserInfo> _orderedUsers = new List<UserInfo>();
-        int _currentUserIndex = 0;
 
         public UserInfo CurrentUser { get; set; }
 
@@ -22,7 +21,7 @@ namespace DayDaily.Design
             CurrentUser = _users.ElementAt(0).Value;
         }
 
-        public async Task LoadAsync() { }
+        public Task LoadAsync() { return null; }
 
         public IList<UserInfo> GetAllUserInfos() => new List<UserInfo>(from keyValuePair in _users select keyValuePair.Value);
 
@@ -33,10 +32,9 @@ namespace DayDaily.Design
             _orderedUsers.Add(user);
         }
 
-        public void SetNextUser()
+        public void SetUserByOrder(int index)
         {
-            CurrentUser = _orderedUsers[_currentUserIndex];
-            _currentUserIndex++;
+            CurrentUser = _orderedUsers[index];
         }
     }
 }
