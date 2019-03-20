@@ -123,6 +123,7 @@
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\ISettingService.cs" />
+    <Compile Include="Model\SecDataService.cs" />
     <Compile Include="Model\VO\JiraItem.cs" />
     <Compile Include="Model\SettingService.cs" />
     <Compile Include="Model\VO\ScreenInfo.cs" />
