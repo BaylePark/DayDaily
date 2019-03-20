@@ -4,16 +4,19 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DayDaily.Model
 {
     public class SecDataService : IDataService
     {
-        IDictionary<string, UserInfo> _users = new Dictionary<string, UserInfo>();
-        IList<JiraItem> _jiraItems = new List<JiraItem>();
+        IDictionary<string, UserInfo> _users = new ConcurrentDictionary<string, UserInfo>();
+        ConcurrentBag<JiraItem> _jiraItems = new ConcurrentBag<JiraItem>();
         IList<UserInfo> _orderedUsers = new List<UserInfo>();
 
         public UserInfo CurrentUser { get; set; }
@@ -27,9 +30,11 @@ namespace DayDaily.Model
 
         public IList<JiraItem> GetJiraItemsByUserName(string name) => new List<JiraItem>(from jiraitem in _jiraItems where jiraitem.User.Name == name select jiraitem);
 
+        readonly object _syncPrimitive = new object();
+
         public async Task LoadAsync()
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 var alertWaitCondition = new Func<IWebDriver, IAlert>((d) =>
                 {
@@ -43,7 +48,8 @@ namespace DayDaily.Model
                     }
                 });
 
-                string tokenUrl;
+                string tokenUrl = "";
+                /*
                 using (var service = InternetExplorerDriverService.CreateDefaultService())
                 {
                     var options = new InternetExplorerOptions();
@@ -70,6 +76,51 @@ namespace DayDaily.Model
                         tokenUrl = wait.Until(d => d.FindElement(By.XPath("//input[@name='tokenUrl']"))).GetAttribute("value");
                     }
                 }
+                */
+                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    System.Windows.Forms.WebBrowser wb = new System.Windows.Forms.WebBrowser();
+                    wb.Url = new System.Uri("http://sso.vd.sec.samsung.net/", System.UriKind.Absolute);
+                    bool firstRun = true;
+                    wb.DocumentCompleted += (s, e) =>
+                    {
+                        if (firstRun)
+                        {
+                            wb.Document.InvokeScript("getUrlToken", new object[] { "wiki" });
+                            firstRun = false;
+                        }
+                        else if (wb.Url.ToString().ToLower().Contains("connect"))
+                        {
+                            System.Windows.Forms.HtmlElement scriptElem = wb.Document.CreateElement("script");
+                            scriptElem.SetAttribute("type", "text/javascript");
+                            scriptElem.SetAttribute("text", "window.alert = function () { }; window.confirm=function () { }; ");
+                            wb.Document.GetElementsByTagName("head")[0].AppendChild(scriptElem);
+
+                            if (wb.Document.Forms.Count == 0)
+                            {
+                                return;
+                            }
+
+                            System.Windows.Forms.HtmlElement elem = wb.Document.Forms[0];
+                            System.Windows.Forms.HtmlElementCollection elemColl = elem.GetElementsByTagName("input").GetElementsByName("tokenUrl");
+                            if (elemColl == null || elemColl.Count == 0)
+                            {
+                                return;
+                            }
+
+                            tokenUrl = elemColl[0].GetAttribute("value");
+                            lock (_syncPrimitive)
+                            {
+                                Monitor.Pulse(_syncPrimitive);
+                            }
+                        }
+                    };
+                }), null);
+
+                lock (_syncPrimitive)
+                {
+                    Monitor.Wait(_syncPrimitive);
+                }
 
                 using (var service = ChromeDriverService.CreateDefaultService())
                 {
@@ -88,51 +139,57 @@ namespace DayDaily.Model
                         driver.Url = "http://jira.vd.sec.samsung.net/secure/RapidBoard.jspa?rapidView=3332";
 
                         var issues = wait.Until(d => d.FindElements(By.ClassName("ghx-issue")));
-                        foreach (var issue in issues)
-                        {
-                            var type = issue.FindElement(By.ClassName("ghx-type")).GetAttribute("title");
-                            var key = issue.FindElement(By.ClassName("ghx-key")).FindElement(By.TagName("a")).GetAttribute("title");
-                            var title = issue.FindElement(By.ClassName("ghx-summary")).GetAttribute("title");
-                            var assignee = issue.FindElement(By.ClassName("ghx-avatar-img")).GetAttribute("data-tooltip");
-                            string status = null;
-                            foreach (var extrafield in issue.FindElements(By.ClassName("ghx-extra-field")))
-                            {
-                                if (extrafield.GetAttribute("data-tooltip").Contains("Status"))
-                                {
-                                    status = extrafield.GetAttribute("data-tooltip");
-                                    break;
-                                }
-                            }
-                            System.Diagnostics.Debug.WriteLine("{0} / {1} / {2} / {3} / {4}", new object[] { type, key, title, assignee, status });
+                        IEnumerable<Task> parseTask = from issue in issues select Parse(issue);
 
-                            var userinfoStrs = assignee.Split(new char[] { '/', ':' });
-                            var userName = userinfoStrs[1].Trim();
-                            UserInfo userInfo = null;
-                            if (_users.ContainsKey(userName) == false)
-                            {
-                                userInfo = new UserInfo()
-                                {
-                                    Name = userName,
-                                    SingleID = userinfoStrs[2].Trim(),
-                                    Belong = userinfoStrs[3].Trim()
-                                };
-                                _users.Add(userInfo.Name, userInfo);
-                            }
-                            else
-                            {
-                                userInfo = _users[userName];
-                            }
-
-                            var jiraItem = new JiraItem(key, title, userInfo)
-                            {
-                                Status = ParseJiraItemStatus(status),
-                                Type = ParseJiraItemType(type),
-                            };
-
-                            _jiraItems.Add(jiraItem);
-                        }
+                        await Task.WhenAll(parseTask);
                     }
                 }
+            });
+        }
+
+        private async Task Parse(IWebElement issue)
+        {
+            await Task.Run(() =>
+            {
+                var type = issue.FindElement(By.ClassName("ghx-type")).GetAttribute("title");
+                var key = issue.FindElement(By.ClassName("ghx-key")).FindElement(By.TagName("a")).GetAttribute("title");
+                var title = issue.FindElement(By.ClassName("ghx-summary")).GetAttribute("title");
+                var assignee = issue.FindElement(By.ClassName("ghx-avatar-img")).GetAttribute("data-tooltip");
+                string status = null;
+                foreach (var extrafield in issue.FindElements(By.ClassName("ghx-extra-field")))
+                {
+                    if (extrafield.GetAttribute("data-tooltip").Contains("Status"))
+                    {
+                        status = extrafield.GetAttribute("data-tooltip");
+                        break;
+                    }
+                }
+
+                var userinfoStrs = assignee.Split(new char[] { '/', ':' }, 4);
+                var userName = userinfoStrs[1].Trim();
+                UserInfo userInfo = null;
+                if (_users.ContainsKey(userName) == false)
+                {
+                    userInfo = new UserInfo()
+                    {
+                        Name = userName,
+                        SingleID = userinfoStrs[2].Trim(),
+                        Belong = userinfoStrs[3].Trim()
+                    };
+                    _users.Add(userInfo.Name, userInfo);
+                }
+                else
+                {
+                    userInfo = _users[userName];
+                }
+
+                var jiraItem = new JiraItem(key, title, userInfo)
+                {
+                    Status = ParseJiraItemStatus(status.Split(':')[1]),
+                    Type = ParseJiraItemType(type),
+                };
+
+                _jiraItems.Add(jiraItem);
             });
         }
 
@@ -163,7 +220,7 @@ namespace DayDaily.Model
         private JiraItemStatus ParseJiraItemStatus(string status)
         {
             JiraItemStatus ret = JiraItemStatus.Backlog;
-            switch(status.ToLower().Trim())
+            switch (status.ToLower().Trim())
             {
                 case "backlog":
                     ret = JiraItemStatus.Backlog;
