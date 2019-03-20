@@ -12,14 +12,24 @@ namespace DayDaily.Model
 {
     public class SecDataService : IDataService
     {
-        IList<DeveloperInfo> _developers = new List<DeveloperInfo>();
+        IDictionary<string, UserInfo> _users = new Dictionary<string, UserInfo>();
+        IList<JiraItem> _jiraItems = new List<JiraItem>();
+        IList<UserInfo> _orderedUsers = new List<UserInfo>();
 
-        Task _loadingTask;
-        DeveloperInfo _selectedDeveloper = null;
+        public UserInfo CurrentUser { get; set; }
+
+        public void AddOrderedUser(UserInfo user)
+        {
+            _orderedUsers.Add(user);
+        }
+
+        public IList<UserInfo> GetAllUserInfos() => new List<UserInfo>(from keyValuePair in _users select keyValuePair.Value);
+
+        public IList<JiraItem> GetJiraItemsByUserName(string name) => new List<JiraItem>(from jiraitem in _jiraItems where jiraitem.User.Name == name select jiraitem);
 
         public async Task LoadAsync()
         {
-            _loadingTask = Task.Run(() =>
+            await Task.Run(() =>
             {
                 var alertWaitCondition = new Func<IWebDriver, IAlert>((d) =>
                 {
@@ -98,24 +108,11 @@ namespace DayDaily.Model
                     }
                 }
             });
-            await _loadingTask;
         }
 
-        public IList<UserInfo> GetAllUserInfos() => new List<UserInfo>(from developer in _developers select developer.UserInfo);
-
-        public DeveloperInfo GetCurrentDeveloperInfo() => _selectedDeveloper;
-
-        public void SetCurrentDeveloper(string name)
+        public void SetUserByOrder(int index)
         {
-            var selctedDeveloper = from developer in _developers
-                                   where developer.UserInfo.Name == name
-                                   select developer;
-            _selectedDeveloper = selctedDeveloper.ElementAt(0);
-        }
-
-        public string GetWelcomeMessage()
-        {
-            throw new NotImplementedException();
+            CurrentUser = _orderedUsers[index];
         }
     }
 }
