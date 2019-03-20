@@ -74,6 +74,10 @@ namespace DayDaily.ViewModel
                 {
                     IncreaseUser(new UserPageControlMessage(UserPageControlType.Next));
                 }
+                else if (msg.From is JiraViewModel)
+                {
+                    CurrentViewModel = SimpleIoc.Default.GetInstance<StatisticsViewModel>();
+                }
             });
 
             MessengerInstance.Register<UserPageControlMessage>(this, (msg) =>

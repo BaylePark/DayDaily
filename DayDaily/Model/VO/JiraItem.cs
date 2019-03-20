@@ -5,6 +5,7 @@
         Epic,
         Story,
         Task,
+        SubTask,
         Bug,
     }
 

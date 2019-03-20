@@ -16,27 +16,13 @@ using System.Windows.Shapes;
 namespace DayDaily.Views
 {
     /// <summary>
-    /// LoadingView.xaml에 대한 상호 작용 논리
+    /// StatisticsView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class LoadingView : UserControl
+    public partial class StatisticsView : UserControl
     {
-        public LoadingView()
+        public StatisticsView()
         {
             InitializeComponent();
-            Loaded += (s, e) =>
-            {
-            };
-        }
-        private void DisableAlert()
-        {
-            // Disable Alert
-        }
-
-        bool firstRun = true;
-
-        private void Wb_DocumentCompleted(object sender, System.Windows.Forms.WebBrowserDocumentCompletedEventArgs e)
-        {
-            
         }
     }
 }

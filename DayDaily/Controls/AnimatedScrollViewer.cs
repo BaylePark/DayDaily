@@ -22,21 +22,18 @@ namespace DayDaily.Controls
                     AnimatedScrollViewer target = o as AnimatedScrollViewer;
                     if (target == null) return;
 
-                    double offset = (double)e.NewValue;
-
-                    if (offset > target.ScrollableHeight)
+                    double offset = 0;
+                    if ((double)e.NewValue < 0)
                     {
-                        target.CurrentVerticalOffset = offset;
-                        return;
+                        offset = target.VerticalOffset - 500;
                     }
-                    else if (offset < 0)
+                    else
                     {
-                        target.CurrentVerticalOffset = 0;
-                        return;
+                        offset = target.VerticalOffset + 500;
                     }
 
                     var easeFunction = new PowerEase() { EasingMode = EasingMode.EaseOut, Power = 8 };
-                    var scrollanim = new DoubleAnimation(offset, TimeSpan.FromSeconds(1)) { EasingFunction = easeFunction };
+                    var scrollanim = new DoubleAnimation(offset, TimeSpan.FromSeconds(0.2)) { EasingFunction = easeFunction };
                     target.BeginAnimation(ScrollProperty, scrollanim);
                 }));
 

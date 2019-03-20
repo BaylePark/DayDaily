@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="DayDaily.Views.StatisticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DayDaily.Views"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:converter="clr-namespace:DayDaily.Common.Converter"
+             xmlns:behaviors="clr-namespace:DayDaily.Common.Behaviors"
+             DataContext="{Binding Statistics, Source={StaticResource Locator}}" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             behaviors:FocusAfterLoadedBehavior.FocusAfterLoaded="True"
+             behaviors:InputBindingsBehavior.TakesInputBindingPrecedence="True">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Storyboard x:Key="bounceArrowsStoryboard" AutoReverse="True" RepeatBehavior="Forever">
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="downArrow">
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="20">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <BackEase EasingMode="EaseOut" Amplitude="2"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+            <SolidColorBrush x:Key="indicatorColor" Color="#7F000000" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <ei:ControlStoryboardAction Storyboard="{StaticResource bounceArrowsStoryboard}" ControlStoryboardOption="Play"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding CompleteCommand}" Key="Down" />
+    </UserControl.InputBindings>
+
+    <Grid>
+        <TextBlock TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="50">
+            통계는 준비중이에요!<LineBreak />
+            오늘 하루도 화이팅!
+        </TextBlock>
+        <WrapPanel Margin="20" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <TextBlock TextAlignment="Center" Foreground="{StaticResource indicatorColor}">
+                종료하시려면 <LineBreak />
+                Down Key를 눌러주세요
+            </TextBlock>
+            <Viewbox x:Name="downArrow" Width="48" Height="48" RenderTransformOrigin="0.5,0.5">
+                <Viewbox.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Viewbox.RenderTransform>
+                <Canvas Width="24" Height="24">
+                    <Path Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" Fill="{StaticResource indicatorColor}" />
+                </Canvas>
+            </Viewbox>
+        </WrapPanel>
+    </Grid>
+</UserControl>

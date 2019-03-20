@@ -37,6 +37,7 @@ namespace DayDaily.ViewModel
             SimpleIoc.Default.Register<LoadingViewModel>();
             SimpleIoc.Default.Register<SettingViewModel>();
             SimpleIoc.Default.Register<UserViewModel>();
+            SimpleIoc.Default.Register<StatisticsViewModel>();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
@@ -49,6 +50,8 @@ namespace DayDaily.ViewModel
         public SettingViewModel Setting { get => ServiceLocator.Current.GetInstance<SettingViewModel>(); }
 
         public UserViewModel User { get => ServiceLocator.Current.GetInstance<UserViewModel>(); }
+
+        public StatisticsViewModel Statistics { get => ServiceLocator.Current.GetInstance<StatisticsViewModel>(); }
 
         public static void Cleanup()
         {

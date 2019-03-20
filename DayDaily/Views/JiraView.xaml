@@ -130,7 +130,10 @@
                 <BlurEffect Radius="20"/>
             </Border.Effect>
             <Grid>
+                <!--
                 <ctrls:AnimatedScrollViewer VerticalScrollBarVisibility="Hidden" CurrentVerticalOffset="{Binding VerticalScrollOffset}">
+                -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding JiraItemsByStatus}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -174,11 +177,11 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ctrls:AnimatedScrollViewer>
+                </ScrollViewer>
             </Grid>
         </Border>
 
-        <Border x:Name="splashGrid" Background="#99204E5F" CornerRadius="20" d:IsHidden="True">
+        <Border x:Name="splashGrid" Background="#99204E5F" CornerRadius="20">
             <WrapPanel Orientation="Vertical" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center">
@@ -213,7 +216,7 @@
             </WrapPanel>
         </Border>
 
-        <Grid d:IsHidden="True">
+        <Grid>
             <Grid.Style>
                 <Style TargetType="{x:Type Grid}">
                     <Style.Triggers>
@@ -252,19 +255,23 @@
                 </TextBlock>
             </WrapPanel>
             <WrapPanel Margin="20" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <WrapPanel.Style>
-                    <Style TargetType="{x:Type WrapPanel}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsLastUser}" Value="True">
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </WrapPanel.Style>
-                <TextBlock TextAlignment="Right" Foreground="{StaticResource indicatorColor}">
-                    오늘은 그냥 넘어가야 한다구요?<LineBreak />
-                    Right Key를 눌러주세요
-                </TextBlock>
+                <WrapPanel Orientation="Vertical">
+                    <TextBlock TextAlignment="Right" Foreground="{StaticResource indicatorColor}">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLastUser}" Value="True">
+                                        <Setter Property="Text" Value="마지막까지 고생하셨어요! 통계가 준비돼있습니다" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsLastUser}" Value="False">
+                                        <Setter Property="Text" Value="오늘은 그냥 넘어가야 한다구요?" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock TextAlignment="Right" Foreground="{StaticResource indicatorColor}" Text="Right Key를 눌러주세요" />
+                </WrapPanel>
                 <Viewbox x:Name="rightArrow" Width="48" Height="48" RenderTransformOrigin="0.5,0.5">
                     <Viewbox.RenderTransform>
                         <TransformGroup>

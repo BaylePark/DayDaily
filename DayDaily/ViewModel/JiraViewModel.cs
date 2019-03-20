@@ -54,6 +54,7 @@ namespace DayDaily.ViewModel
                     CompleteUser();
                     if (IsLastUser)
                     {
+                        MessengerInstance.Send(new CompleteMessage(this));
                         return;
                     }
                     MessengerInstance.Send(new UserPageControlMessage(UserPageControlType.Next));
@@ -82,7 +83,7 @@ namespace DayDaily.ViewModel
 #if DEBUG
                     IsShaking = true;
 #endif
-                    VerticalScrollOffset += 200;
+                    VerticalScrollOffset++;
                     return;
                 }
                 SplashViewVisibility = false;
@@ -96,7 +97,7 @@ namespace DayDaily.ViewModel
             get => _upKeyCommand ?? (_upKeyCommand = new RelayCommand(
                 () =>
                 {
-                    VerticalScrollOffset -= 200;
+                    VerticalScrollOffset--;
                 }));
         }
         #endregion
