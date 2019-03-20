@@ -29,7 +29,7 @@ namespace DayDaily.ViewModel
             }
             else
             {
-                SimpleIoc.Default.Register<IDataService, DataService>();
+                SimpleIoc.Default.Register<IDataService, SecDataService>();
                 SimpleIoc.Default.Register<ISettingService, SettingService>();
             }
 

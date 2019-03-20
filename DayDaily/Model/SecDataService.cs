@@ -104,10 +104,84 @@ namespace DayDaily.Model
                                 }
                             }
                             System.Diagnostics.Debug.WriteLine("{0} / {1} / {2} / {3} / {4}", new object[] { type, key, title, assignee, status });
+
+                            var userinfoStrs = assignee.Split(new char[] { '/', ':' });
+                            var userName = userinfoStrs[1].Trim();
+                            UserInfo userInfo = null;
+                            if (_users.ContainsKey(userName) == false)
+                            {
+                                userInfo = new UserInfo()
+                                {
+                                    Name = userName,
+                                    SingleID = userinfoStrs[2].Trim(),
+                                    Belong = userinfoStrs[3].Trim()
+                                };
+                                _users.Add(userInfo.Name, userInfo);
+                            }
+                            else
+                            {
+                                userInfo = _users[userName];
+                            }
+
+                            var jiraItem = new JiraItem(key, title, userInfo)
+                            {
+                                Status = ParseJiraItemStatus(status),
+                                Type = ParseJiraItemType(type),
+                            };
+
+                            _jiraItems.Add(jiraItem);
                         }
                     }
                 }
             });
+        }
+
+        private JiraItemType ParseJiraItemType(string type)
+        {
+            JiraItemType ret = JiraItemType.Task;
+            switch (type.ToLower().Trim())
+            {
+                case "epic":
+                    ret = JiraItemType.Epic;
+                    break;
+                case "story":
+                    ret = JiraItemType.Story;
+                    break;
+                case "task":
+                    ret = JiraItemType.Task;
+                    break;
+                case "sub-task":
+                    ret = JiraItemType.SubTask;
+                    break;
+                case "bug":
+                    ret = JiraItemType.Bug;
+                    break;
+            }
+            return ret;
+        }
+
+        private JiraItemStatus ParseJiraItemStatus(string status)
+        {
+            JiraItemStatus ret = JiraItemStatus.Backlog;
+            switch(status.ToLower().Trim())
+            {
+                case "backlog":
+                    ret = JiraItemStatus.Backlog;
+                    break;
+                case "to do":
+                    ret = JiraItemStatus.ToDo;
+                    break;
+                case "in progress":
+                    ret = JiraItemStatus.InProgress;
+                    break;
+                case "pending":
+                    ret = JiraItemStatus.Pending;
+                    break;
+                case "done":
+                    ret = JiraItemStatus.Done;
+                    break;
+            }
+            return ret;
         }
 
         public void SetUserByOrder(int index)

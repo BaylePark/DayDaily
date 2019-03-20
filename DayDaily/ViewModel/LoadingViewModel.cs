@@ -21,7 +21,6 @@ namespace DayDaily.ViewModel
                 await Task.Run(async () =>
                 {
                     await _dataService.LoadAsync();
-                    Thread.Sleep(1000);
                 });
 
                 MessengerInstance.Send(new CompleteMessage(this));
