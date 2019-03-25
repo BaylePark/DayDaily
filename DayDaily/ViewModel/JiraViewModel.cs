@@ -39,10 +39,14 @@ namespace DayDaily.ViewModel
         double _verticalScrollOffset;
         public double VerticalScrollOffset { get => _verticalScrollOffset; set => Set(ref _verticalScrollOffset, value); }
 
+        double _shakingFactor = 0.03;
+        public double ShakingFactor { get => _shakingFactor; set => Set(ref _shakingFactor, value); }
+
         public IList<JiraItem>[] JiraItemsByStatus { get; private set; } = new IList<JiraItem>[5];
 
         DispatcherTimer _timer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(1) };
-        IDataService _dataService;
+        private readonly IDataService _dataService;
+        private readonly IStatisticsService _statisticsService;
 
         #region Commands
         public RelayCommand _nextUserCommand;
@@ -52,6 +56,10 @@ namespace DayDaily.ViewModel
                 () =>
                 {
                     CompleteUser();
+                    if (SplashViewVisibility == false)
+                    {
+                        _statisticsService.EndUser(UserInfo);
+                    }
                     if (IsLastUser)
                     {
                         MessengerInstance.Send(new CompleteMessage(this));
@@ -68,6 +76,10 @@ namespace DayDaily.ViewModel
                 () =>
                 {
                     CompleteUser();
+                    if (SplashViewVisibility == false)
+                    {
+                        _statisticsService.EndUser(UserInfo);
+                    }
                     MessengerInstance.Send(new UserPageControlMessage(UserPageControlType.Prev));
                 },
                 () => !IsFirstUser));
@@ -83,11 +95,11 @@ namespace DayDaily.ViewModel
 #if DEBUG
                     IsShaking = true;
 #endif
-                    VerticalScrollOffset++;
                     return;
                 }
                 SplashViewVisibility = false;
                 _timer.Start();
+                _statisticsService.StartUser(UserInfo);
             }));
         }
 
@@ -110,6 +122,7 @@ namespace DayDaily.ViewModel
         public JiraViewModel()
         {
             _dataService = GalaSoft.MvvmLight.Ioc.SimpleIoc.Default.GetInstance<IDataService>();
+            _statisticsService = GalaSoft.MvvmLight.Ioc.SimpleIoc.Default.GetInstance<IStatisticsService>();
 
             UserInfo = _dataService.CurrentUser;
             JiraItems = _dataService.GetJiraItemsByUserName(UserInfo.Name);
@@ -125,9 +138,13 @@ namespace DayDaily.ViewModel
             _timer.Tick += (s, e) =>
             {
                 CurrentClock++;
-                if (!IsShaking && CurrentClock >= 120)
+                if (CurrentClock >= 120)
                 {
-                    IsShaking = true;
+                    if (!IsShaking) IsShaking = true;
+                    if (ShakingFactor < 3.0)
+                    {
+                        ShakingFactor += 0.03;
+                    }
                 }
             };
         }

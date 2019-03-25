@@ -15,6 +15,9 @@ namespace DayDaily.Controls
         public static readonly DependencyProperty OpeningEffectsOffsetProperty = DependencyProperty.Register(
            "OpeningEffectsOffset", typeof(TimeSpan), typeof(AnimatedItemsControlContent), new PropertyMetadata(default(TimeSpan)));
 
+        public static readonly DependencyProperty DelayProperty = DependencyProperty.Register(
+           "Delay", typeof(TimeSpan), typeof(AnimatedItemsControlContent), new PropertyMetadata(default(TimeSpan)));
+
         public Storyboard Storyboard
         {
             get => GetValue(StoryboardProperty) as Storyboard;
@@ -25,6 +28,12 @@ namespace DayDaily.Controls
         {
             get => (TimeSpan)GetValue(OpeningEffectsOffsetProperty);
             set => SetValue(OpeningEffectsOffsetProperty, value);
+        }
+
+        public TimeSpan Delay
+        {
+            get => (TimeSpan)GetValue(DelayProperty);
+            set => SetValue(DelayProperty, value);
         }
 
         public override void OnApplyTemplate()
@@ -40,7 +49,7 @@ namespace DayDaily.Controls
         {
             var storyboard = Storyboard.Clone();
             ContentPresenter cp = GetNameScopeRoot() as ContentPresenter;
-            storyboard.BeginTime = OpeningEffectsOffset;
+            storyboard.BeginTime = Delay + OpeningEffectsOffset;
             storyboard.Begin(cp.Content as FrameworkElement);
         }
 

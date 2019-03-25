@@ -9,6 +9,8 @@ namespace DayDaily.Design
     {
         public int SelectedScreenIndex { get; set; } = 0;
 
+        public int ScreenCount => 3;
+
         public Rect GetWindowRectFromIndex(int index)
         {
             return new Rect(0, 0, 600, 480);

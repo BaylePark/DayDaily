@@ -8,34 +8,52 @@ namespace DayDaily.Controls
 {
     public class ShakingBorder : Border
     {
-        public static readonly DependencyProperty IsShakingProperty =
-            DependencyProperty.Register("IsShaking", typeof(bool), typeof(ShakingBorder), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None, IsShakingPropertyChanged));
-
         static Random _random = new Random();
 
-        static void IsShakingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var shakingBorder = d as ShakingBorder;
+        public static readonly DependencyProperty IsShakingProperty =
+            DependencyProperty.Register("IsShaking", typeof(bool), typeof(ShakingBorder), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None,
+                (s, e) =>
+                {
+                    var shakingBorder = s as ShakingBorder;
+                    if (shakingBorder == null) return;
 
-            var keyframes = new DoubleAnimationUsingKeyFrames();
-            keyframes.Duration = TimeSpan.FromMilliseconds(_random.Next(200) + 100);
-            var startAnimation = new EasingDoubleKeyFrame(-1, KeyTime.FromPercent(0.5), new SineEase() { EasingMode = EasingMode.EaseIn });
-            var endAnimation = new EasingDoubleKeyFrame(1, KeyTime.FromPercent(1.0), new SineEase() { EasingMode = EasingMode.EaseOut });
-            keyframes.KeyFrames.Add(startAnimation);
-            keyframes.KeyFrames.Add(endAnimation);
-            keyframes.AutoReverse = true;
-            keyframes.RepeatBehavior = RepeatBehavior.Forever;
+                    shakingBorder.keyframes.Duration = TimeSpan.FromMilliseconds(_random.Next(200) + 100);
+                    shakingBorder.keyframes.KeyFrames.Add(shakingBorder.StartAnimation);
+                    shakingBorder.keyframes.KeyFrames.Add(shakingBorder.EndAnimation);
+                    shakingBorder.keyframes.AutoReverse = true;
+                    shakingBorder.keyframes.RepeatBehavior = RepeatBehavior.Forever;
 
-            var rt = (RotateTransform)shakingBorder.RenderTransform;
-            rt.BeginAnimation(RotateTransform.AngleProperty, keyframes);
-        }
+                    var rt = (RotateTransform)shakingBorder.RenderTransform;
+                    rt.BeginAnimation(RotateTransform.AngleProperty, shakingBorder.keyframes);
+                }));
 
         public bool IsShaking { get => (bool)GetValue(IsShakingProperty); set => SetValue(IsShakingProperty, value); }
+
+        public static readonly DependencyProperty ShakingFactorProperty =
+            DependencyProperty.Register("ShakingFactor", typeof(double), typeof(ShakingBorder), new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.None,
+                (s, e) =>
+                {
+                    var shakingBorder = s as ShakingBorder;
+                    if (shakingBorder == null) return;
+
+                    shakingBorder.StartAnimation.Value = (double)e.NewValue * -1;
+                    shakingBorder.EndAnimation.Value = (double)e.NewValue;
+                    var rt = (RotateTransform)shakingBorder.RenderTransform;
+                    rt.BeginAnimation(RotateTransform.AngleProperty, shakingBorder.keyframes, HandoffBehavior.SnapshotAndReplace);
+                }));
+
+        public double ShakingFactor { get => (double)GetValue(ShakingFactorProperty); set => SetValue(ShakingFactorProperty, value); }
+
+        DoubleAnimationUsingKeyFrames keyframes = new DoubleAnimationUsingKeyFrames();
+        EasingDoubleKeyFrame StartAnimation { get; set; }
+        EasingDoubleKeyFrame EndAnimation { get; set; }
 
         public ShakingBorder()
         {
             RenderTransformOrigin = new Point(.5, .5);
             RenderTransform = new RotateTransform(0);
+            StartAnimation = new EasingDoubleKeyFrame(ShakingFactor * -1, KeyTime.FromPercent(0.5), new SineEase() { EasingMode = EasingMode.EaseIn });
+            EndAnimation = new EasingDoubleKeyFrame(ShakingFactor, KeyTime.FromPercent(1.0), new SineEase() { EasingMode = EasingMode.EaseOut });
         }
     }
 }

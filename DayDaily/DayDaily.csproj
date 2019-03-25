@@ -102,6 +102,9 @@
     <Compile Include="Common\Behaviors\FocusAfterLoadedBehavior.cs" />
     <Compile Include="Common\Behaviors\InputBindingsBehavior.cs" />
     <Compile Include="Common\Behaviors\ScrollViewerBehavior.cs" />
+    <Compile Include="Common\Converter\IsSameJiraTypeConverter.cs" />
+    <Compile Include="Common\Converter\IsStringEmptyOrNull.cs" />
+    <Compile Include="Common\Converter\TimelineSizeConverter.cs" />
     <Compile Include="Common\Converter\PathToBitmapImageConverter.cs" />
     <Compile Include="Common\Converter\SizeToStringConverter.cs" />
     <Compile Include="Common\Converter\StringFormatConverter.cs" />
@@ -113,9 +116,13 @@
     <Compile Include="Controls\MainViewDataTemplateSelector.cs" />
     <Compile Include="Controls\ShakingBorder.cs" />
     <Compile Include="Controls\ShakingTextBlock.cs" />
+    <Compile Include="Controls\Timeline.xaml.cs">
+      <DependentUpon>Timeline.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Timer.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Design\DesignSettingService.cs" />
+    <Compile Include="Design\DesignStatisticsService.cs" />
     <Compile Include="Design\MockCreator.cs" />
     <Compile Include="Messages\ChangeWindowRectMessage.cs" />
     <Compile Include="Messages\CompleteMessage.cs" />
@@ -123,11 +130,14 @@
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\ISettingService.cs" />
+    <Compile Include="Model\IStatisticsService.cs" />
     <Compile Include="Model\SecDataService.cs" />
+    <Compile Include="Model\StatisticsService.cs" />
     <Compile Include="Model\VO\JiraItem.cs" />
     <Compile Include="Model\SettingService.cs" />
     <Compile Include="Model\VO\ScreenInfo.cs" />
     <Compile Include="Model\VO\Settings.cs" />
+    <Compile Include="Model\VO\Record.cs" />
     <Compile Include="Model\VO\UserInfo.cs" />
     <Compile Include="ViewModel\JiraViewModel.cs" />
     <Compile Include="ViewModel\LoadingViewModel.cs" />
@@ -151,6 +161,10 @@
     <Compile Include="Views\UserView.xaml.cs">
       <DependentUpon>UserView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\Timeline.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -212,6 +226,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Resources\koverwatch.ttf" />
     <Resource Include="Resources\NanumSquareB.ttf" />
     <Resource Include="Resources\NanumSquareEB.ttf" />
     <Resource Include="Resources\NanumSquareR.ttf" />

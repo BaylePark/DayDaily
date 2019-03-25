@@ -22,6 +22,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <converter:PathToBitmapImageConverter x:Key="pathToBitmapImageConverter" />
+            <converter:IsSameJiraTypeConverter x:Key="isSameJiraTypeConverter" />
+            <converter:IsStringEmptyOrNull x:Key="isStringEmptyOrNull" />
+
             <Storyboard x:Key="hideSplashStoryboard">
                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="userThumbGrid">
                     <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}"/>
@@ -104,6 +107,83 @@
 
             <SolidColorBrush x:Key="indicatorColor" Color="#7FFFFFFF" />
 
+            <Style x:Key="jiraItemIcon" TargetType="Rectangle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Type}" Value="{x:Static vo:JiraItemType.Task}">
+                        <Setter Property="Fill">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource Task}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="{x:Static vo:JiraItemType.SubTask}">
+                        <Setter Property="Fill">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource SubTask}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="{x:Static vo:JiraItemType.Story}">
+                        <Setter Property="Fill">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource Story}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="{x:Static vo:JiraItemType.Bug}">
+                        <Setter Property="Fill">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource Bug}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="{x:Static vo:JiraItemType.Epic}">
+                        <Setter Property="Fill">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource Epic}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <DataTemplate DataType="{x:Type vo:JiraItem}">
+                <DataTemplate.Resources>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" />
+                </DataTemplate.Resources>
+                <ctrls:ShakingBorder x:Name="jiraIssueBorder"
+                                            BorderBrush="#FFD8D8D8" BorderThickness="1"
+                                            IsShaking="{Binding DataContext.IsShaking, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                            ShakingFactor="{Binding DataContext.ShakingFactor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                            CornerRadius="20" Margin="5" Background="White" Padding="10">
+                    <StackPanel Orientation="Vertical">
+                        <Grid>
+                            <TextBlock Text="{Binding Key}" Margin="0,5"/>
+                            <Rectangle HorizontalAlignment="Right" Width="25" Height="25" Style="{StaticResource jiraItemIcon}" />
+                        </Grid>
+                        <TextBlock Text="{Binding Title}" 
+                                TextWrapping="Wrap" Margin="0,5"
+                                FontFamily="/DayDaily;component/Resources/#NanumSquare"
+                                FontSize="20px" />
+                        <Border CornerRadius="10" Padding="10,5" Background="AliceBlue">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding EpicTitle, Converter={StaticResource isStringEmptyOrNull}}" Value="True">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                            <Setter Property="Height" Value="0" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding EpicTitle}" 
+                                    TextWrapping="Wrap" 
+                                    FontSize="22" 
+                                    FontFamily="/DayDaily;component/Resources/#NanumSquare Bold"/>
+                        </Border>
+                    </StackPanel>
+                </ctrls:ShakingBorder>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -130,9 +210,6 @@
                 <BlurEffect Radius="20"/>
             </Border.Effect>
             <Grid>
-                <!--
-                <ctrls:AnimatedScrollViewer VerticalScrollBarVisibility="Hidden" CurrentVerticalOffset="{Binding VerticalScrollOffset}">
-                -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding JiraItemsByStatus}">
                         <ItemsControl.ItemsPanel>
@@ -148,31 +225,6 @@
                                             <StackPanel Orientation="Vertical" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type vo:JiraItem}">
-                                            <DataTemplate.Resources>
-                                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" />
-                                            </DataTemplate.Resources>
-                                            <ctrls:ShakingBorder 
-                                            BorderBrush="#FFD8D8D8" BorderThickness="1"
-                                            IsShaking="{Binding DataContext.IsShaking, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
-                                            CornerRadius="20" Margin="5" Background="White" Padding="10">
-                                                <StackPanel Orientation="Vertical">
-                                                    <TextBlock Text="{Binding Key}" Margin="0,5"/>
-                                                    <TextBlock Text="{Binding Title}" 
-                                                               TextWrapping="Wrap" Margin="0,5"
-                                                               FontFamily="/DayDaily;component/Resources/#NanumSquare"
-                                                               FontSize="20px" />
-                                                    <Border CornerRadius="10" Padding="10,5" Background="AliceBlue">
-                                                        <TextBlock Text="{Binding EpicTitle}" 
-                                                               TextWrapping="Wrap" 
-                                                               FontSize="22" 
-                                                               FontFamily="/DayDaily;component/Resources/#NanumSquare Bold"/>
-                                                    </Border>
-                                                </StackPanel>
-                                            </ctrls:ShakingBorder>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -181,7 +233,7 @@
             </Grid>
         </Border>
 
-        <Border x:Name="splashGrid" Background="#99204E5F" CornerRadius="20">
+        <Border x:Name="splashGrid" Background="#99204E5F" CornerRadius="20" d:IsHidden="True">
             <WrapPanel Orientation="Vertical" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center">
@@ -337,7 +389,7 @@
             </Ellipse>
             <ctrls:UserTimer CurrentClock="{Binding CurrentClock}"
                              Fill="#204E5F" OverTimeFill="#FF8984" VerticalAlignment="Bottom" 
-                             Width="100" Height="100"/>
+                             Width="150" Height="150"/>
         </Grid>
     </Grid>
 </UserControl>

@@ -27,9 +27,16 @@ namespace DayDaily.Model
 
         public int SelectedScreenIndex
         {
-            get => _settings.SelectedScreenIndex;
+            get
+            {
+                if (_settings.SelectedScreenIndex >= ScreenCount)
+                    return 0;
+                return _settings.SelectedScreenIndex;
+            }
             set => _settings.SelectedScreenIndex = value;
         }
+
+        public int ScreenCount => Common.Screen.GetScreenCount();
 
         public Rect GetWindowRectFromIndex(int index)
         {

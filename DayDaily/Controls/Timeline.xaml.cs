@@ -13,19 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DayDaily.Views
+namespace DayDaily.Controls
 {
     /// <summary>
-    /// LoadingView.xaml에 대한 상호 작용 논리
+    /// Timeline.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class LoadingView : UserControl
+    public partial class Timeline : ItemsControl
     {
-        public LoadingView()
+        public Timeline()
         {
             InitializeComponent();
-            Loaded += (s, e) =>
-            {
-            };
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using DayDaily.Model.VO;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DayDaily.Model
 {
-    public interface IDataService
+    public interface IDataService : IDisposable
     {
         UserInfo CurrentUser { get; set; }
 

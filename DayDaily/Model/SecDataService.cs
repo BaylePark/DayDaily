@@ -1,7 +1,6 @@
 ﻿using DayDaily.Model.VO;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Concurrent;
@@ -32,10 +31,14 @@ namespace DayDaily.Model
 
         readonly object _syncPrimitive = new object();
 
+        private ChromeDriver _chromeDriver;
+
         public async Task LoadAsync()
         {
             await Task.Run(async () =>
             {
+                string tokenUrl = "";
+#if DISABLED
                 var alertWaitCondition = new Func<IWebDriver, IAlert>((d) =>
                 {
                     try
@@ -47,9 +50,6 @@ namespace DayDaily.Model
                         return null;
                     }
                 });
-
-                string tokenUrl = "";
-                /*
                 using (var service = InternetExplorerDriverService.CreateDefaultService())
                 {
                     var options = new InternetExplorerOptions();
@@ -76,7 +76,7 @@ namespace DayDaily.Model
                         tokenUrl = wait.Until(d => d.FindElement(By.XPath("//input[@name='tokenUrl']"))).GetAttribute("value");
                     }
                 }
-                */
+#endif
                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     System.Windows.Forms.WebBrowser wb = new System.Windows.Forms.WebBrowser();
@@ -129,68 +129,61 @@ namespace DayDaily.Model
                     service.HideCommandPromptWindow = true;
                     options.AddArgument("headless");
 #endif
-                    using (var driver = new ChromeDriver(service, options))
-                    {
-                        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(60);
-                        //driver.Manage().Window.FullScreen();
-                        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                    _chromeDriver = new ChromeDriver(service, options);
+                    _chromeDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(60);
+                    //driver.Manage().Window.FullScreen();
+                    WebDriverWait wait = new WebDriverWait(_chromeDriver, TimeSpan.FromSeconds(10));
 
-                        driver.Url = tokenUrl;
-                        driver.Url = "http://jira.vd.sec.samsung.net/secure/RapidBoard.jspa?rapidView=3332";
+                    _chromeDriver.Url = tokenUrl;
+                    _chromeDriver.Url = "http://jira.vd.sec.samsung.net/secure/RapidBoard.jspa?rapidView=3332";
 
-                        var issues = wait.Until(d => d.FindElements(By.ClassName("ghx-issue")));
-                        IEnumerable<Task> parseTask = from issue in issues select Parse(issue);
-
-                        await Task.WhenAll(parseTask);
-                    }
+                    var issues = wait.Until(d => d.FindElements(By.ClassName("ghx-issue")));
+                    foreach (var issue in issues) Parse(issue);
                 }
             });
         }
 
-        private async Task Parse(IWebElement issue)
+        private void Parse(IWebElement issue)
         {
-            await Task.Run(() =>
+            var type = issue.FindElement(By.ClassName("ghx-type")).GetAttribute("title");
+            var key = issue.FindElement(By.ClassName("ghx-key")).FindElement(By.TagName("a")).GetAttribute("title");
+            var title = issue.FindElement(By.ClassName("ghx-summary")).GetAttribute("title");
+            var assignee = issue.FindElement(By.ClassName("ghx-avatar-img")).GetAttribute("data-tooltip");
+            string status = null;
+            foreach (var extrafield in issue.FindElements(By.ClassName("ghx-extra-field")))
             {
-                var type = issue.FindElement(By.ClassName("ghx-type")).GetAttribute("title");
-                var key = issue.FindElement(By.ClassName("ghx-key")).FindElement(By.TagName("a")).GetAttribute("title");
-                var title = issue.FindElement(By.ClassName("ghx-summary")).GetAttribute("title");
-                var assignee = issue.FindElement(By.ClassName("ghx-avatar-img")).GetAttribute("data-tooltip");
-                string status = null;
-                foreach (var extrafield in issue.FindElements(By.ClassName("ghx-extra-field")))
+                if (extrafield.GetAttribute("data-tooltip").Contains("Status"))
                 {
-                    if (extrafield.GetAttribute("data-tooltip").Contains("Status"))
-                    {
-                        status = extrafield.GetAttribute("data-tooltip");
-                        break;
-                    }
+                    status = extrafield.GetAttribute("data-tooltip");
+                    break;
                 }
+            }
 
-                var userinfoStrs = assignee.Split(new char[] { '/', ':' }, 4);
-                var userName = userinfoStrs[1].Trim();
-                UserInfo userInfo = null;
-                if (_users.ContainsKey(userName) == false)
+            var userinfoStrs = assignee.Split(new char[] { '/', ':' }, 4);
+            var userName = userinfoStrs[1].Trim();
+            UserInfo userInfo = null;
+            if (_users.ContainsKey(userName) == false)
+            {
+                userInfo = new UserInfo()
                 {
-                    userInfo = new UserInfo()
-                    {
-                        Name = userName,
-                        SingleID = userinfoStrs[2].Trim(),
-                        Belong = userinfoStrs[3].Trim()
-                    };
-                    _users.Add(userInfo.Name, userInfo);
-                }
-                else
-                {
-                    userInfo = _users[userName];
-                }
-
-                var jiraItem = new JiraItem(key, title, userInfo)
-                {
-                    Status = ParseJiraItemStatus(status.Split(':')[1]),
-                    Type = ParseJiraItemType(type),
+                    Name = userName,
+                    SingleID = userinfoStrs[2].Trim(),
+                    Belong = userinfoStrs[3].Trim()
                 };
+                _users.Add(userInfo.Name, userInfo);
+            }
+            else
+            {
+                userInfo = _users[userName];
+            }
 
-                _jiraItems.Add(jiraItem);
-            });
+            var jiraItem = new JiraItem(key, title, userInfo)
+            {
+                Status = ParseJiraItemStatus(status.Split(':')[1]),
+                Type = ParseJiraItemType(type),
+            };
+
+            _jiraItems.Add(jiraItem);
         }
 
         private JiraItemType ParseJiraItemType(string type)
@@ -241,9 +234,28 @@ namespace DayDaily.Model
             return ret;
         }
 
-        public void SetUserByOrder(int index)
+        public void SetUserByOrder(int index) => CurrentUser = _orderedUsers[index];
+
+        #region IDisposable Support
+        private bool disposedValue = false; // 중복 호출을 검색하려면
+
+        protected virtual void Dispose(bool disposing)
         {
-            CurrentUser = _orderedUsers[index];
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _chromeDriver.Dispose();
+                }
+
+                disposedValue = true;
+            }
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

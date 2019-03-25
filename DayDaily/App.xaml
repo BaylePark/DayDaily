@@ -12,12 +12,75 @@
         <ResourceDictionary>
             <!--Global View Model Locator-->
             <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
-            
+
             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="FontFamily" Value="/DayDaily;component/Resources/#NanumSquare Light" />
                 <Setter Property="FontSize" Value="25px" />
             </Style>
-            
+
+            <Viewbox x:Key="Bug" Stretch="Uniform">
+                <Canvas Width="14" Height="14">
+                    <Rectangle Canvas.Left="0" Canvas.Top="0" Width="14" Height="14" RadiusX="2" RadiusY="2" Fill="#FFE5493A" StrokeThickness="1"/>
+                    <Path Fill="#FFFFFFFF" StrokeThickness="1">
+                        <Path.Data>
+                            <PathGeometry Figures="M10 7 C10 8.657 8.657 10 7 10 C5.343 10 4 8.657 4 7 C4 5.343 5.343 4 7 4 C8.657 4 10 5.343 10 7" FillRule="EvenOdd"/>
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="Epic" Stretch="Uniform">
+                <Canvas Width="14" Height="14">
+                    <Rectangle Canvas.Left="0" Canvas.Top="0" Width="14" Height="14" RadiusX="2" RadiusY="2" Fill="#FF904EE2" StrokeThickness="1"/>
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <TranslateTransform X="4.000000" Y="3.000000"/>
+                        </Canvas.RenderTransform>
+                        <Path Fill="#FFFFFFFF" StrokeThickness="1">
+                            <Path.Data>
+                                <PathGeometry Figures="M5.9233 3.7566 L5.9213 3.7526 C5.9673 3.6776 6.0003 3.5946 6.0003 3.4996 C6.0003 3.2236 5.7763 2.9996 5.5003 2.9996 L3.0003 2.9996 L3.0003 0.4996 C3.0003 0.2236 2.7763 -0.0004 2.5003 -0.0004 C2.3283 -0.0004 2.1853 0.0916 2.0953 0.2226 C2.0673 0.2636 2.0443 0.3056 2.0293 0.3526 L0.0813 4.2366 L0.0833 4.2396 C0.0353 4.3166 0.0003 4.4026 0.0003 4.4996 C0.0003 4.7766 0.2243 4.9996 0.5003 4.9996 L3.0003 4.9996 L3.0003 7.4996 C3.0003 7.7766 3.2243 7.9996 3.5003 7.9996 C3.6793 7.9996 3.8293 7.9006 3.9183 7.7586 L3.9213 7.7596 L3.9343 7.7336 C3.9453 7.7126 3.9573 7.6936 3.9653 7.6716 L5.9233 3.7566 Z" FillRule="EvenOdd"/>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="Story" Stretch="Uniform">
+                <Canvas Width="14" Height="14">
+                    <Rectangle Canvas.Left="0" Canvas.Top="0" Width="14" Height="14" RadiusX="2" RadiusY="2" Fill="#FF63BA3C" StrokeThickness="1"/>
+                    <Path Fill="#FFFFFFFF" StrokeThickness="1">
+                        <Path.Data>
+                            <PathGeometry Figures="M9 3 L5 3 C4.448 3 4 3.448 4 4 L4 10.5 C4 10.776 4.224 11 4.5 11 C4.675 11 4.821 10.905 4.91 10.769 L4.914 10.77 L6.84 8.54 C6.92 8.434 7.08 8.434 7.16 8.54 L9.086 10.77 L9.09 10.769 C9.179 10.905 9.325 11 9.5 11 C9.776 11 10 10.776 10 10.5 L10 4 C10 3.448 9.552 3 9 3" FillRule="EvenOdd"/>
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="SubTask" Stretch="Uniform">
+                <Canvas Width="14" Height="14">
+                    <Rectangle Canvas.Left="0" Canvas.Top="0" Width="14" Height="14" RadiusX="2" RadiusY="2"  Fill="#FF4BAEE8" StrokeThickness="1"/>
+                    <Rectangle Canvas.Left="3" Canvas.Top="3" Width="5" Height="5" RadiusX="0.800000012" RadiusY="0.800000012" StrokeThickness="1" Stroke="#FFFFFFFF"/>
+                    <Rectangle Canvas.Left="6" Canvas.Top="6" Width="5" Height="5" RadiusX="0.800000012" RadiusY="0.800000012" Fill="#FFFFFFFF" StrokeThickness="1" Stroke="#FFFFFFFF"/>
+                </Canvas>
+            </Viewbox>
+            <Viewbox x:Key="Task">
+                <Canvas Width="14" Height="14">
+                    <Rectangle Canvas.Left="0" Canvas.Top="0" Width="14" Height="14" RadiusX="2" RadiusY="2" Fill="#FF4BADE8" StrokeThickness="1"/>
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <TranslateTransform X="4.000000" Y="4.500000"/>
+                        </Canvas.RenderTransform>
+                        <Path StrokeThickness="2" Stroke="#FFFFFFFF" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                            <Path.Data>
+                                <PathGeometry Figures="M2 5 L6 0" FillRule="EvenOdd"/>
+                            </Path.Data>
+                        </Path>
+                        <Path StrokeThickness="2" Stroke="#FFFFFFFF" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                            <Path.Data>
+                                <PathGeometry Figures="M2 5 L0 3" FillRule="EvenOdd"/>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                </Canvas>
+            </Viewbox>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />

@@ -10,6 +10,7 @@ namespace DayDaily.ViewModel
     {
         private readonly IDataService _dataService;
         private readonly ISettingService _settingService;
+        private readonly IStatisticsService _statisticsService;
 
         #region Binding Properties
         private ViewModelBase _currentViewModel;
@@ -43,10 +44,11 @@ namespace DayDaily.ViewModel
             };
         }
 
-        public MainViewModel(IDataService dataService, ISettingService settingService)
+        public MainViewModel(IDataService dataService, ISettingService settingService, IStatisticsService statisticsService)
         {
             _dataService = dataService;
             _settingService = settingService;
+            _statisticsService = statisticsService;
 
             var selectedScreenIdx = _settingService.SelectedScreenIndex;
             WindowRect = _settingService.GetWindowRectFromIndex(selectedScreenIdx);
@@ -72,10 +74,12 @@ namespace DayDaily.ViewModel
                 }
                 else if (msg.From is UserViewModel)
                 {
+                    _statisticsService.StartDailyMeeting();
                     IncreaseUser(new UserPageControlMessage(UserPageControlType.Next));
                 }
                 else if (msg.From is JiraViewModel)
                 {
+                    _statisticsService.EndDailyMeeting();
                     CurrentViewModel = SimpleIoc.Default.GetInstance<StatisticsViewModel>();
                 }
             });
@@ -88,9 +92,11 @@ namespace DayDaily.ViewModel
 
         private Size CalculateWorkingSize(Rect windowRect)
         {
-            Size size = new Size();
-            size.Width = windowRect.Width * 9 / 10;
-            size.Height = windowRect.Height * 9 / 10;
+            Size size = new Size
+            {
+                Width = windowRect.Width * 9 / 10,
+                Height = windowRect.Height * 9 / 10
+            };
             return size;
         }
     }

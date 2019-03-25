@@ -26,11 +26,13 @@ namespace DayDaily.ViewModel
             {
                 SimpleIoc.Default.Register<IDataService, Design.DesignDataService>();
                 SimpleIoc.Default.Register<ISettingService, Design.DesignSettingService>();
+                SimpleIoc.Default.Register<IStatisticsService, Design.DesignStatisticsService>();
             }
             else
             {
-                SimpleIoc.Default.Register<IDataService, SecDataService>();
+                SimpleIoc.Default.Register<IDataService, DataService>();
                 SimpleIoc.Default.Register<ISettingService, SettingService>();
+                SimpleIoc.Default.Register<IStatisticsService, StatisticsService>();
             }
 
             SimpleIoc.Default.Register<MainViewModel>();
@@ -55,6 +57,7 @@ namespace DayDaily.ViewModel
 
         public static void Cleanup()
         {
+            SimpleIoc.Default.GetInstance<IDataService>().Dispose();
         }
     }
 }

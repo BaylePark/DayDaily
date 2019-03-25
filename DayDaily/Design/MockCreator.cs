@@ -28,7 +28,7 @@ namespace DayDaily.Design
                 for (int i = 0; i < itemCount; i++)
                 {
                     var status = (JiraItemStatus)(r.Next(5));
-                    var type = (JiraItemType)(r.Next(4));
+                    var type = (JiraItemType)(r.Next(5));
 
                     string title = "";
                     int titleLen = r.Next(60) + 20;
@@ -42,8 +42,12 @@ namespace DayDaily.Design
                     {
                         Status = status,
                         Type = type,
-                        EpicTitle = "EPIC #" + r.Next(100),
                     };
+
+                    if (r.Next(100) < 40)
+                    {
+                        jiraitem.EpicTitle = "EPIC #" + r.Next(100);
+                    }
 
                     jiraItems.Add(jiraitem);
                     id++;
