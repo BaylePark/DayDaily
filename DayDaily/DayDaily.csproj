@@ -29,7 +29,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>https://raw.githubusercontent.com/BaylePark/DayDaily/master/DayDaily/publish/</InstallUrl>
     <UpdateUrl>https://raw.githubusercontent.com/BaylePark/DayDaily/master/DayDaily/publish/</UpdateUrl>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>0.9.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
