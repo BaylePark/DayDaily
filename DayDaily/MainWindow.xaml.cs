@@ -29,8 +29,7 @@ namespace DayDaily
         private static IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             const int WM_DISPLAYCHANGE = 0x007e;
-            MainWindow window = HwndSource.FromHwnd(hWnd).RootVisual as MainWindow;
-            if (window == null) return IntPtr.Zero;
+            if (!(HwndSource.FromHwnd(hWnd).RootVisual is MainWindow window)) return IntPtr.Zero;
             switch (msg)
             {
                 case WM_DISPLAYCHANGE:

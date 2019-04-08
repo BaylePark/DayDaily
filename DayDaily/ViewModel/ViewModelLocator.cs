@@ -59,7 +59,6 @@ namespace DayDaily.ViewModel
 
         public static void Cleanup()
         {
-            SimpleIoc.Default.GetInstance<IDisplayService>().RevertResolution();
             SimpleIoc.Default.GetInstance<IDataService>().Dispose();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using DayDaily.Model;
 using DayDaily.Model.VO;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -27,12 +28,16 @@ namespace DayDaily.Design
             }
         });
 
+        public event EventHandler DisplayChanged;
+
         public void ChangeAllResolution(Size resolution)
-        {   
+        {
+            throw new NotImplementedException();
         }
 
-        public void RevertResolution()
+        public void NotifyDisplayChanged()
         {
+            throw new NotImplementedException();
         }
     }
 }

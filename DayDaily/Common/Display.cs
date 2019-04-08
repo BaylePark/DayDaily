@@ -82,15 +82,6 @@ namespace DayDaily.Common.Interop
         CDS_NORESET = 0x10000000
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct POINTL
-    {
-        [MarshalAs(UnmanagedType.I4)]
-        public int x;
-        [MarshalAs(UnmanagedType.I4)]
-        public int y;
-    }
-
     [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Ansi)]
     public struct DEVMODE
     {
@@ -129,7 +120,9 @@ namespace DayDaily.Common.Interop
         public Int16 dmPrintQuality;
 
         [System.Runtime.InteropServices.FieldOffset(44)]
-        public POINTL dmPosition;
+        public Int32 dmPositionX;
+        [System.Runtime.InteropServices.FieldOffset(48)]
+        public Int32 dmPositionY;
         [System.Runtime.InteropServices.FieldOffset(52)]
         public Int32 dmDisplayOrientation;
         [System.Runtime.InteropServices.FieldOffset(56)]

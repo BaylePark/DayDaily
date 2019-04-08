@@ -4,6 +4,7 @@ using DayDaily.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Ioc;
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -29,7 +30,8 @@ namespace DayDaily.ViewModel
         RelayCommand displayChangedCommand_;
         public ICommand DisplayChangedCommand => displayChangedCommand_ ?? (displayChangedCommand_ = new RelayCommand(() =>
         {
-
+            _displayService.ChangeAllResolution(new Size(1920, 1080));
+            _displayService.NotifyDisplayChanged();
         }));
         #endregion
 
