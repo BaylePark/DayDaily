@@ -4,8 +4,8 @@ namespace DayDaily.Common.Behaviors
 {
     class WindowPositionBehavior
     {
-        public static readonly DependencyProperty WorkingAreaProperty =
-            DependencyProperty.RegisterAttached("WorkingArea", typeof(Point), typeof(WindowPositionBehavior),
+        public static readonly DependencyProperty LocationProperty =
+            DependencyProperty.RegisterAttached("Location", typeof(Point), typeof(WindowPositionBehavior),
                 new PropertyMetadata(default(Point), (s, e) =>
                 {
                     Window window = s as Window;
@@ -16,13 +16,13 @@ namespace DayDaily.Common.Behaviors
                     window.WindowState = WindowState.Maximized;
                 }));
 
-        public static Point GetWorkingArea(FrameworkElement obj)
+        public static Point GetLocation(FrameworkElement obj)
         {
-            return (Point)obj.GetValue(WorkingAreaProperty);
+            return (Point)obj.GetValue(LocationProperty);
         }
-        public static void SetWorkingArea(FrameworkElement obj, Point value)
+        public static void SetLocation(FrameworkElement obj, Point value)
         {
-            obj.SetValue(WorkingAreaProperty, value);
+            obj.SetValue(LocationProperty, value);
         }
     }
 }
