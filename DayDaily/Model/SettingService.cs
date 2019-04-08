@@ -12,6 +12,8 @@ namespace DayDaily.Model
         readonly private string _path = @Path.Combine(Environment.CurrentDirectory, "settings.json");
         private Settings _settings = new Settings();
 
+        public DisplayDeviceInfo LastScreenInfo { get => _settings.LastDisplayDevice; set => _settings.LastDisplayDevice = value; }
+
         public SettingService()
         {
             LoadSettingFile();
@@ -24,34 +26,7 @@ namespace DayDaily.Model
                 _settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(_path));
             }
         }
-
-        public int SelectedScreenIndex
-        {
-            get
-            {
-                if (_settings.SelectedScreenIndex >= ScreenCount)
-                    return 0;
-                return _settings.SelectedScreenIndex;
-            }
-            set => _settings.SelectedScreenIndex = value;
-        }
-
-        public int ScreenCount => Common.Screen.GetScreenCount();
-
-        public Rect GetWindowRectFromIndex(int index)
-        {
-            return Common.Screen.GetScreenFromIndex(index).DeviceBounds;
-        }
-
-        public IEnumerable<ScreenInfo> GetAllScreens()
-        {
-            int index = 0;
-            foreach (var screen in Common.Screen.AllScreens())
-            {
-                yield return new ScreenInfo() { Index = index++, IsPrimary = screen.IsPrimary, Resolution = screen.DeviceBounds.Size, DeviceName = screen.DeviceName };
-            }
-        }
-
+        
         public void SaveSettings()
         {
             File.WriteAllText(_path, JsonConvert.SerializeObject(_settings));

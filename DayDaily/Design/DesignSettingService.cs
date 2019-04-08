@@ -1,33 +1,14 @@
 ﻿using DayDaily.Model;
 using DayDaily.Model.VO;
-using System.Collections.Generic;
-using System.Windows;
 
 namespace DayDaily.Design
 {
     class DesignSettingService : ISettingService
     {
-        public int SelectedScreenIndex { get; set; } = 0;
-
-        public int ScreenCount => 3;
-
-        public Rect GetWindowRectFromIndex(int index)
+        public DisplayDeviceInfo LastScreenInfo
         {
-            return new Rect(0, 0, 600, 480);
-        }
-
-        public IEnumerable<ScreenInfo> GetAllScreens()
-        {
-            ScreenInfo[] infos = new ScreenInfo[]
-            {
-                new ScreenInfo() {Index = 1, IsPrimary= true, Resolution = new Size(1920, 1080), DeviceName="Bayle"},
-                new ScreenInfo() {Index = 2, IsPrimary= false, Resolution = new Size(3840, 2160), DeviceName="LG"},
-                new ScreenInfo() {Index = 3, IsPrimary= false, Resolution = new Size(2440, 1380), DeviceName="Samsung"}
-            };
-            foreach (var screenInfo in infos)
-            {
-                yield return screenInfo;
-            }
+            get => new DisplayDeviceInfo() { DeviceKey = "HASH#1" };
+            set => throw new System.NotImplementedException();
         }
 
         public void SaveSettings()

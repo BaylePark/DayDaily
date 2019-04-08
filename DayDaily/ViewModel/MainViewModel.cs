@@ -1,13 +1,18 @@
-﻿using DayDaily.Messages;
+﻿using DayDaily.Common;
+using DayDaily.Messages;
 using DayDaily.Model;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Ioc;
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Input;
 
 namespace DayDaily.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+        private readonly IDisplayService _displayService;
         private readonly IDataService _dataService;
         private readonly ISettingService _settingService;
         private readonly IStatisticsService _statisticsService;
@@ -16,11 +21,16 @@ namespace DayDaily.ViewModel
         private ViewModelBase _currentViewModel;
         public ViewModelBase CurrentViewModel { get => _currentViewModel; set => Set(ref _currentViewModel, value); }
 
-        private Rect _windowRect = new Rect(0, 0, 1920, 1080);
-        public Rect WindowRect { get => _windowRect; set => Set(ref _windowRect, value); }
+        private Point _location = new Point(0, 0);
+        public Point Location { get => _location; set => Set(ref _location, value); }
+        #endregion
 
-        public Size _workingRect = new Size(1920, 1080);
-        public Size WorkingRect { get => _workingRect; set => Set(ref _workingRect, value); }
+        #region Commands
+        RelayCommand displayChangedCommand_;
+        public ICommand DisplayChangedCommand => displayChangedCommand_ ?? (displayChangedCommand_ = new RelayCommand(() =>
+        {
+
+        }));
         #endregion
 
         int _userIndex = -1;
@@ -44,22 +54,20 @@ namespace DayDaily.ViewModel
             };
         }
 
-        public MainViewModel(IDataService dataService, ISettingService settingService, IStatisticsService statisticsService)
+        public MainViewModel(IDisplayService displayService, IDataService dataService, ISettingService settingService, IStatisticsService statisticsService)
         {
+            _displayService = displayService;
             _dataService = dataService;
             _settingService = settingService;
             _statisticsService = statisticsService;
 
-            var selectedScreenIdx = _settingService.SelectedScreenIndex;
-            WindowRect = _settingService.GetWindowRectFromIndex(selectedScreenIdx);
-            WorkingRect = CalculateWorkingSize(WindowRect);
-
+            _displayService.ChangeAllResolution(new Size(1920, 1080));
             CurrentViewModel = SimpleIoc.Default.GetInstance<LoadingViewModel>();
 
             MessengerInstance.Register<ChangeWindowRectMessage>(this, (msg) =>
             {
-                WindowRect = msg.ChangingRect;
-                WorkingRect = CalculateWorkingSize(WindowRect);
+                Location = msg.Location;
+                Debug.WriteLine(string.Format("Location has been changed ({0}, {1})", Location.X, Location.Y));
             });
 
             MessengerInstance.Register<CompleteMessage>(this, (msg) =>
@@ -88,16 +96,6 @@ namespace DayDaily.ViewModel
             {
                 IncreaseUser(msg);
             });
-        }
-
-        private Size CalculateWorkingSize(Rect windowRect)
-        {
-            Size size = new Size
-            {
-                Width = windowRect.Width * 9 / 10,
-                Height = windowRect.Height * 9 / 10
-            };
-            return size;
         }
     }
 }
