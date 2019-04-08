@@ -21,6 +21,7 @@
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         ResizeMode="NoResize" 
         WindowStyle="None"
+        WindowState="Maximized"
         Width="1920"
         Height="1080"
         behaviors:WindowPositionBehavior.Location="{Binding Location}"
