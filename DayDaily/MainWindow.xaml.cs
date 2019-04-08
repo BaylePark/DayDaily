@@ -1,8 +1,7 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
+﻿using DayDaily.ViewModel;
+using System;
 using System.Windows;
-using DayDaily.ViewModel;
+using System.Windows.Interop;
 
 namespace DayDaily
 {
@@ -18,29 +17,27 @@ namespace DayDaily
         {
             InitializeComponent();
             Closing += (s, e) => ViewModelLocator.Cleanup();
+            Loaded += (s, e) =>
+            {
+                HwndSource source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+                source.AddHook(WndProc);
+            };
         }
 
-        private double GetDPI()
-        {
-            double dpi = 1.0;
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                dpi = g.DpiX / 96.0; 
-            }
-            return dpi;
-        }
+        public event EventHandler DisplayChanged;
 
-        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        private static IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            base.OnPropertyChanged(e);
-            if (e.Property == MinWidthProperty)
+            const int WM_DISPLAYCHANGE = 0x007e;
+            MainWindow window = HwndSource.FromHwnd(hWnd).RootVisual as MainWindow;
+            if (window == null) return IntPtr.Zero;
+            switch (msg)
             {
-                SetValue(MinWidthProperty, (double)e.NewValue / GetDPI());
+                case WM_DISPLAYCHANGE:
+                    window.DisplayChanged?.Invoke(window, new EventArgs());
+                    break;
             }
-            else if (e.Property == MinHeightProperty)
-            {
-                SetValue(MinHeightProperty, (double)e.NewValue / GetDPI());
-            }
+            return IntPtr.Zero;
         }
     }
 }

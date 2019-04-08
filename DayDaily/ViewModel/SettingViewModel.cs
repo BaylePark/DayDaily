@@ -5,19 +5,20 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DayDaily.ViewModel
 {
     public class ScreenControlViewModel : ViewModelBase
     {
-        ScreenInfo _info;
-        public ScreenInfo Info { get => _info; set => Set(ref _info, value); }
+        DisplayDeviceInfo _info;
+        public DisplayDeviceInfo Info { get => _info; set => Set(ref _info, value); }
 
         bool _isSelected = false;
         public bool IsSelected { get => _isSelected; set => Set(ref _isSelected, value); }
 
-        public ScreenControlViewModel(ScreenInfo info)
+        public ScreenControlViewModel(DisplayDeviceInfo info)
         {
             Info = info;
         }
@@ -43,12 +44,12 @@ namespace DayDaily.ViewModel
                 ScreenList[_selectedScreenIndex].IsSelected = false;
                 _selectedScreenIndex = value;
                 ScreenList[_selectedScreenIndex].IsSelected = true;
-                MessengerInstance.Send(new ChangeWindowRectMessage() { ChangingRect = _settingService.GetWindowRectFromIndex(_selectedScreenIndex) });
-                _settingService.SelectedScreenIndex = _selectedScreenIndex;
+                MessengerInstance.Send(new ChangeWindowRectMessage(ScreenList[_selectedScreenIndex].Info.Region.Location));
             }
         }
 
         #region Services
+        IDisplayService _displayService;
         ISettingService _settingService;
         #endregion
 
@@ -69,20 +70,30 @@ namespace DayDaily.ViewModel
             get => _completeCommand ?? (_completeCommand = new RelayCommand(() =>
             {
                 MessengerInstance.Send(new CompleteMessage(this));
-                Task.Run(() => _settingService.SaveSettings());
+
+                Task.Run(() =>
+                {
+                    _settingService.LastScreenInfo = ScreenList[_selectedScreenIndex].Info;
+                    _settingService.SaveSettings();
+                });
             }));
         }
         #endregion
 
-        public SettingViewModel(ISettingService settingService)
+        public SettingViewModel(IDisplayService displayService, ISettingService settingService)
         {
+            _displayService = displayService;
             _settingService = settingService;
 
-            var selectedScreenIndex = _settingService.SelectedScreenIndex;
-            foreach (var screen in _settingService.GetAllScreens())
+            var lastScreenInfo = _settingService.LastScreenInfo;
+            var selectedScreenIndex = 0;
+            foreach (var device in _displayService.DisplayDevices)
             {
-                var scvm = new ScreenControlViewModel(screen);
-                ScreenList.Add(scvm);
+                ScreenList.Add(new ScreenControlViewModel(device));
+                if (lastScreenInfo?.DeviceKey == device.DeviceKey)
+                {
+                    selectedScreenIndex = ScreenList.Count - 1;
+                }
             }
             SelectedScreenIndex = selectedScreenIndex;
         }

@@ -8,7 +8,7 @@ namespace DayDaily.Common
 {
     public class Screen
     {
-        public static IEnumerable<Screen> AllScreens()
+        public static IEnumerable<Screen> GetAllScreens()
         {
             foreach (var screen in System.Windows.Forms.Screen.AllScreens)
             {

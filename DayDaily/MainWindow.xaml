@@ -11,6 +11,8 @@
         xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:ctrls="clr-namespace:DayDaily.Controls"
+        xmlns:behaviors="clr-namespace:DayDaily.Common.Behaviors"
+        xmlns:local="clr-namespace:DayDaily"
         mc:Ignorable="d ignore"
         Title="DayDaily"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -18,12 +20,13 @@
         TextOptions.TextRenderingMode="Auto" 
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         ResizeMode="NoResize" 
-        WindowStyle="None" 
+        WindowStyle="None"
+        Width="1920"
+        Height="1080"
+        Left="{Binding Location.X}"
+        Top="{Binding Location.Y}"
         Background="{x:Null}"
-        AllowsTransparency="True"
-        MinWidth="{Binding WindowRect.Width, Mode=TwoWay}" MinHeight="{Binding WindowRect.Height, Mode=TwoWay}"
-        Left="{Binding WindowRect.X, Mode=TwoWay}" Top="{Binding WindowRect.Y, Mode=TwoWay}"
-        SizeToContent="WidthAndHeight">
+        AllowsTransparency="True">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -43,7 +46,24 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Viewbox Width="{Binding WorkingRect.Width, Mode=TwoWay}" Height="{Binding WorkingRect.Height, Mode=TwoWay}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="DisplayChanged">
+            <mvvm:EventToCommand Command="{Binding DisplayChangedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="18*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="18*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Viewbox Grid.Row="1" Grid.Column="1">
         <Grid x:Name="LayoutRoot" Width="1920" Height="1080">
             <Grid.OpacityMask>
                 <VisualBrush Visual="{Binding ElementName=clippingBorder}" />
@@ -56,5 +76,6 @@
                 </ctrls:AnimatedContentControl.OpeningEffects>
             </ctrls:AnimatedContentControl>
         </Grid>
-    </Viewbox>
+        </Viewbox>
+    </Grid>
 </Window>

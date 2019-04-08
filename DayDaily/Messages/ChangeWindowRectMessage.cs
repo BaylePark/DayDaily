@@ -4,6 +4,10 @@ namespace DayDaily.Messages
 {
     public class ChangeWindowRectMessage
     {
-        public Rect ChangingRect { get; set; }
+        public Point Location { get; private set; }
+        public ChangeWindowRectMessage(Point location)
+        {
+            Location = location;
+        }
     }
 }

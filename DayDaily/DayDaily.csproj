@@ -102,12 +102,14 @@
     <Compile Include="Common\Behaviors\FocusAfterLoadedBehavior.cs" />
     <Compile Include="Common\Behaviors\InputBindingsBehavior.cs" />
     <Compile Include="Common\Behaviors\ScrollViewerBehavior.cs" />
+    <Compile Include="Common\Behaviors\WindowPositionBehavior.cs" />
     <Compile Include="Common\Converter\IsSameJiraTypeConverter.cs" />
     <Compile Include="Common\Converter\IsStringEmptyOrNull.cs" />
     <Compile Include="Common\Converter\TimelineSizeConverter.cs" />
     <Compile Include="Common\Converter\PathToBitmapImageConverter.cs" />
     <Compile Include="Common\Converter\SizeToStringConverter.cs" />
     <Compile Include="Common\Converter\StringFormatConverter.cs" />
+    <Compile Include="Common\Display.cs" />
     <Compile Include="Common\Screen.cs" />
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Controls\AnimatedContentControl.cs" />
@@ -121,6 +123,7 @@
     </Compile>
     <Compile Include="Controls\Timer.cs" />
     <Compile Include="Design\DesignDataService.cs" />
+    <Compile Include="Design\DesignDisplayService.cs" />
     <Compile Include="Design\DesignSettingService.cs" />
     <Compile Include="Design\DesignStatisticsService.cs" />
     <Compile Include="Design\MockCreator.cs" />
@@ -128,14 +131,16 @@
     <Compile Include="Messages\CompleteMessage.cs" />
     <Compile Include="Messages\UserPageControlMessage.cs" />
     <Compile Include="Model\DataService.cs" />
+    <Compile Include="Model\DisplayService.cs" />
     <Compile Include="Model\IDataService.cs" />
+    <Compile Include="Model\IDisplayService.cs" />
     <Compile Include="Model\ISettingService.cs" />
     <Compile Include="Model\IStatisticsService.cs" />
     <Compile Include="Model\SecDataService.cs" />
     <Compile Include="Model\StatisticsService.cs" />
+    <Compile Include="Model\VO\DisplayDeviceInfo.cs" />
     <Compile Include="Model\VO\JiraItem.cs" />
     <Compile Include="Model\SettingService.cs" />
-    <Compile Include="Model\VO\ScreenInfo.cs" />
     <Compile Include="Model\VO\Settings.cs" />
     <Compile Include="Model\VO\Record.cs" />
     <Compile Include="Model\VO\UserInfo.cs" />
