@@ -13,3 +13,4 @@
 - [ ] 업데이트 이후 최초 실행 시 ChangeLogView 추가
 - [x] 최근 업데이트 된 JiraItem Border 강조 효과
 - [ ] 상세 보기 구현
+- [ ] Animated User Picture
