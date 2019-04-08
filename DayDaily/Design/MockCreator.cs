@@ -46,8 +46,10 @@ namespace DayDaily.Design
 
                     if (r.Next(100) < 40)
                     {
-                        jiraitem.EpicTitle = "EPIC #" + r.Next(100);
+                        jiraitem.EpicTitle = "LONGLONGLONGLONGLONGLONGLONGLONGEPIC #" + r.Next(100);
                     }
+
+                    jiraitem.UpdatedDate = DateTime.Now.AddDays(-1 * r.Next(5));
 
                     jiraItems.Add(jiraitem);
                     id++;

@@ -147,25 +147,46 @@
                 </Style.Triggers>
             </Style>
 
-            <DataTemplate DataType="{x:Type vo:JiraItem}">
+            <DataTemplate x:Key="jiraItemDataTemplate" DataType="{x:Type vo:JiraItem}">
                 <DataTemplate.Resources>
                     <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}" />
+
                 </DataTemplate.Resources>
                 <ctrls:ShakingBorder x:Name="jiraIssueBorder"
-                                            BorderBrush="#FFD8D8D8" BorderThickness="1"
-                                            IsShaking="{Binding DataContext.IsShaking, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
-                                            ShakingFactor="{Binding DataContext.ShakingFactor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
-                                            CornerRadius="20" Margin="5" Background="White" Padding="10">
+                                     BorderThickness="1"
+                                     IsShaking="{Binding DataContext.IsShaking, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                     ShakingFactor="{Binding DataContext.ShakingFactor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                     CornerRadius="20" Margin="5" Background="White" Padding="10" BorderBrush="#FFD8D8D8">
+                    <ctrls:ShakingBorder.Style>
+                        <Style TargetType="{x:Type ctrls:ShakingBorder}">
+                            <Style.Resources>
+                                <Storyboard x:Key="highlightBorderStoryboard" AutoReverse="True" RepeatBehavior="Forever">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0:0:1" Value="#FFFAE100"/>
+                                    </ColorAnimationUsingKeyFrames>
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0:0:1" Value="#FFFFFEF0"/>
+                                    </ColorAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </Style.Resources>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRecentUpdated}" Value="True" >
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard Storyboard="{StaticResource highlightBorderStoryboard}"/>
+                                    </DataTrigger.EnterActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ctrls:ShakingBorder.Style>
                     <StackPanel Orientation="Vertical">
-                        <Grid>
-                            <TextBlock Text="{Binding Key}" Margin="0,5"/>
-                            <Rectangle HorizontalAlignment="Right" Width="25" Height="25" Style="{StaticResource jiraItemIcon}" />
-                        </Grid>
-                        <TextBlock Text="{Binding Title}" 
-                                TextWrapping="Wrap" Margin="0,5"
-                                FontFamily="/DayDaily;component/Resources/#NanumSquare"
-                                FontSize="20px" />
-                        <Border CornerRadius="10" Padding="10,5" Background="AliceBlue">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle HorizontalAlignment="Left" Width="25" Height="25" Style="{DynamicResource jiraItemIcon}" />
+                            <TextBlock Text="{Binding Key}" Margin="5,0,0,0"
+                                    TextWrapping="Wrap" 
+                                    FontSize="20" 
+                                    FontFamily="/DayDaily;component/Resources/#NanumSquare Light"/>
+                        </StackPanel>
+                        <Border CornerRadius="10" Margin="0,5,0,0" Padding="5" Background="AliceBlue">
                             <Border.Style>
                                 <Style TargetType="Border">
                                     <Style.Triggers>
@@ -178,9 +199,13 @@
                             </Border.Style>
                             <TextBlock Text="{Binding EpicTitle}" 
                                     TextWrapping="Wrap" 
-                                    FontSize="22" 
-                                    FontFamily="/DayDaily;component/Resources/#NanumSquare Bold"/>
+                                    FontSize="20" 
+                                    FontFamily="/DayDaily;component/Resources/#NanumSquare ExtraBold"/>
                         </Border>
+                        <TextBlock Text="{Binding Title}" 
+                                TextWrapping="Wrap" Margin="0,5"
+                                FontFamily="/DayDaily;component/Resources/#NanumSquare"
+                                FontSize="20" />
                     </StackPanel>
                 </ctrls:ShakingBorder>
             </DataTemplate>
@@ -219,7 +244,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ItemsControl ItemsSource="{Binding}">
+                                <ItemsControl ItemsSource="{Binding}" ItemTemplate="{StaticResource jiraItemDataTemplate}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Vertical" />
