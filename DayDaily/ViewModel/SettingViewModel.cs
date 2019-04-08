@@ -4,8 +4,8 @@ using DayDaily.Model.VO;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DayDaily.ViewModel
@@ -32,7 +32,12 @@ namespace DayDaily.ViewModel
 
     public class SettingViewModel : ViewModelBase
     {
-        public IList<ScreenControlViewModel> ScreenList { get; private set; } = new List<ScreenControlViewModel>();
+        IList<ScreenControlViewModel> _screenList = new ObservableCollection<ScreenControlViewModel>();
+        public IList<ScreenControlViewModel> ScreenList
+        {
+            get => _screenList;
+            set => Set(ref _screenList, value);
+        }
 
         private int _selectedScreenIndex = 0;
         public int SelectedScreenIndex
@@ -41,7 +46,8 @@ namespace DayDaily.ViewModel
             set
             {
                 if (value < 0 || value >= ScreenList.Count) return;
-                ScreenList[_selectedScreenIndex].IsSelected = false;
+                if (ScreenList.Count > _selectedScreenIndex)
+                    ScreenList[_selectedScreenIndex].IsSelected = false;
                 _selectedScreenIndex = value;
                 ScreenList[_selectedScreenIndex].IsSelected = true;
                 MessengerInstance.Send(new ChangeWindowRectMessage(ScreenList[_selectedScreenIndex].Info.Region.Location));
@@ -80,11 +86,8 @@ namespace DayDaily.ViewModel
         }
         #endregion
 
-        public SettingViewModel(IDisplayService displayService, ISettingService settingService)
+        private void InitScreenInfo()
         {
-            _displayService = displayService;
-            _settingService = settingService;
-
             var lastScreenInfo = _settingService.LastScreenInfo;
             var selectedScreenIndex = 0;
             foreach (var device in _displayService.DisplayDevices)
@@ -96,6 +99,18 @@ namespace DayDaily.ViewModel
                 }
             }
             SelectedScreenIndex = selectedScreenIndex;
+        }
+
+        public SettingViewModel(IDisplayService displayService, ISettingService settingService)
+        {
+            _displayService = displayService;
+            _settingService = settingService;
+            InitScreenInfo();
+            _displayService.DisplayChanged += (s, e) =>
+            {
+                ScreenList.Clear();
+                InitScreenInfo();
+            };
         }
     }
 }

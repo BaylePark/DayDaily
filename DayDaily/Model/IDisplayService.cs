@@ -1,4 +1,5 @@
 ﻿using DayDaily.Model.VO;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -9,6 +10,7 @@ namespace DayDaily.Model
     {
         IList<DisplayDeviceInfo> DisplayDevices { get; }
         void ChangeAllResolution(Size resolution);
-        void RevertResolution();
+        event EventHandler DisplayChanged;
+        void NotifyDisplayChanged();
     }
 }

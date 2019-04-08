@@ -3,7 +3,6 @@ using DayDaily.Common.Interop;
 using DayDaily.Model.VO;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
@@ -12,6 +11,8 @@ namespace DayDaily.Model
     public class DisplayService : IDisplayService
     {
         public IList<DisplayDeviceInfo> DisplayDevices => new List<DisplayDeviceInfo>(GetAllDisplayDevices());
+
+        public event EventHandler DisplayChanged;
 
         private IEnumerable<DisplayDeviceInfo> GetAllDisplayDevices()
         {
@@ -35,8 +36,6 @@ namespace DayDaily.Model
             }
         }
 
-        //Dictionary<string, DEVMODE> _allDevmodes = new Dictionary<string, DEVMODE>();
-
         public void ChangeAllResolution(Size resolution)
         {
             var displayDevice = new DisplayDevice(0);
@@ -45,10 +44,11 @@ namespace DayDaily.Model
             {
                 devNum++;
                 if ((displayDevice.StateFlags & DeviceStatus.DISPLAY_DEVICE_ACTIVE) == 0) continue;
-                DEVMODE devmode = new DEVMODE();
-                devmode.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf<DEVMODE>();
+                DEVMODE devmode = new DEVMODE
+                {
+                    dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf<DEVMODE>()
+                };
                 var ret = NativeMethods.EnumDisplaySettings(displayDevice.DeviceName, -1, ref devmode);
-                //_allDevmodes.Add(displayDevice.DeviceName, devmode);
                 var newDevMode = devmode;
                 newDevMode.dmPelsWidth = (int)resolution.Width;
                 newDevMode.dmPelsHeight = (int)resolution.Height;
@@ -57,15 +57,9 @@ namespace DayDaily.Model
             }
         }
 
-        public void RevertResolution()
+        public void NotifyDisplayChanged()
         {
-            /*
-            foreach(var keyval in _allDevmodes)
-            {
-                var prevDevMode = keyval.Value;
-                prevDevMode.dmFields = DispChangeField.DM_PELSWIDTH | DispChangeField.DM_PELSHEIGHT;
-                var result = NativeMethods.ChangeDisplaySettingsEx(keyval.Key, ref prevDevMode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
-            }*/
+            DisplayChanged?.Invoke(this, new EventArgs());
         }
     }
 }
