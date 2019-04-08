@@ -11,6 +11,5 @@
 - [ ] 생일 축하 시스템
 - [ ] 로딩을 Background에서 하면서 SettingView > UserView > LoadingView 순서로 진행하도록
 - [ ] 업데이트 이후 최초 실행 시 ChangeLogView 추가
-- [ ] 최근 업데이트 된 JiraItem Border 강조 효과
+- [x] 최근 업데이트 된 JiraItem Border 강조 효과
 - [ ] 상세 보기 구현
-- [x] 최근 업데이트 된 Jira Item Highlighting
