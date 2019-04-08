@@ -35,7 +35,8 @@ namespace DayDaily.Model
             }
         }
 
-        List<DEVMODE> _allDevmodes = new List<DEVMODE>();
+        //Dictionary<string, DEVMODE> _allDevmodes = new Dictionary<string, DEVMODE>();
+
         public void ChangeAllResolution(Size resolution)
         {
             var displayDevice = new DisplayDevice(0);
@@ -45,22 +46,26 @@ namespace DayDaily.Model
                 devNum++;
                 if ((displayDevice.StateFlags & DeviceStatus.DISPLAY_DEVICE_ACTIVE) == 0) continue;
                 DEVMODE devmode = new DEVMODE();
-                NativeMethods.EnumDisplaySettings(displayDevice.DeviceName, -1, ref devmode);
-                _allDevmodes.Add(devmode);
+                devmode.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf<DEVMODE>();
+                var ret = NativeMethods.EnumDisplaySettings(displayDevice.DeviceName, -1, ref devmode);
+                //_allDevmodes.Add(displayDevice.DeviceName, devmode);
                 var newDevMode = devmode;
-                newDevMode.dmPelsWidth = (uint)resolution.Width;
-                newDevMode.dmPelsHeight = (uint)resolution.Height;
-                var result = NativeMethods.ChangeDisplaySettings(ref newDevMode, 1);
+                newDevMode.dmPelsWidth = (int)resolution.Width;
+                newDevMode.dmPelsHeight = (int)resolution.Height;
+                newDevMode.dmFields = DispChangeField.DM_PELSWIDTH | DispChangeField.DM_PELSHEIGHT;
+                var result = NativeMethods.ChangeDisplaySettingsEx(displayDevice.DeviceName, ref newDevMode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
             }
         }
 
         public void RevertResolution()
         {
-            foreach(var devmode in _allDevmodes)
+            /*
+            foreach(var keyval in _allDevmodes)
             {
-                var prevDevmode = devmode;
-                var result = NativeMethods.ChangeDisplaySettings(ref prevDevmode, 1);
-            }
+                var prevDevMode = keyval.Value;
+                prevDevMode.dmFields = DispChangeField.DM_PELSWIDTH | DispChangeField.DM_PELSHEIGHT;
+                var result = NativeMethods.ChangeDisplaySettingsEx(keyval.Key, ref prevDevMode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+            }*/
         }
     }
 }

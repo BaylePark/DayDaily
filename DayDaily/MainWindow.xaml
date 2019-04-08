@@ -23,8 +23,7 @@
         WindowStyle="None"
         Width="1920"
         Height="1080"
-        Left="{Binding Location.X}"
-        Top="{Binding Location.Y}"
+        behaviors:WindowPositionBehavior.Location="{Binding Location}"
         Background="{x:Null}"
         AllowsTransparency="True">
 
