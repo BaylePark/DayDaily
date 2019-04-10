@@ -27,6 +27,7 @@ namespace DayDaily.Model.VO
         {
             var yesterday = DateTime.Now.AddDays(-1);
             Yesterday = DateTime.Parse(string.Format("{0}/{1}/{2}", yesterday.Month, yesterday.Day, yesterday.Year));
+            Yesterday.AddHours(12);
         }
 
         public string Key { get; private set; }
